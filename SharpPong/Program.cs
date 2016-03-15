@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
@@ -25,8 +24,7 @@ namespace SharpPong
             const int WIDTH = 800;
             const int HEIGHT = 600;
 
-            //WINDOW
-            // Create the main window
+            // WINDOW
             ContextSettings settings = new ContextSettings();
             settings.AntialiasingLevel = 8;
 
@@ -34,36 +32,47 @@ namespace SharpPong
             window.Closed += new EventHandler(OnClose);
             Color windowColor = new Color(0, 192, 255);          
 
-            //TEXT
+            // TEXT
             Text text = new Text("Hello world", new Font("robotastic.ttf"));
             text.Position = new Vector2f(WIDTH / 2 - 50, 10);                   
             text.CharacterSize = 18;                                   
             text.Color = new Color(255, 255, 255, 170);          
-
-            //SPRITY 
-            Texture paddleTexture = new Texture("paddle.png");
-            RectangleShape paddleL = new RectangleShape(new Vector2f(25,100));
-            paddleL.Texture = paddleTexture;
-            paddleL.Position = new Vector2f(10, HEIGHT / 2);
-            //padddle.Origin
-
-            RectangleShape paddleR = new RectangleShape(new Vector2f(25, 100));
+             
+            // SPRITES 
+            // Left paddle
+            Texture paddleTexture = new Texture("textures/paddle2.png");
+            paddleTexture.Smooth = true;
+            RectangleShape paddleL = new RectangleShape(new Vector2f(20,120));
+            paddleL.Texture = paddleTexture;        
+            paddleL.Position = new Vector2f(10, HEIGHT / 2 - paddleL.Size.Y / 2);
+            
+            // Right paddle
+            RectangleShape paddleR = new RectangleShape(new Vector2f(20, 120));
             paddleR.Texture = paddleTexture;
-            paddleR.Position = new Vector2f(WIDTH - paddleR.Size.X - 10, HEIGHT / 2);
+            paddleR.Position = new Vector2f(WIDTH - paddleR.Size.X - 10, HEIGHT / 2 - paddleR.Size.Y/2);           
 
-            Texture ballTexture = new Texture("ball.png");
-            CircleShape ball = new CircleShape(10);
+            // Ball
+            Texture ballTexture = new Texture("textures/ball2.png");
+            ballTexture.Smooth = true;
+            CircleShape ball = new CircleShape(15);
             ball.Texture = ballTexture;
             ball.Position = new Vector2f(WIDTH / 2, HEIGHT / 2);
 
-            //CLOCK
+            // Background
+            Texture backgroundTexture = new Texture("textures/background.png");
+            RectangleShape background = new RectangleShape(new Vector2f(WIDTH, HEIGHT));
+            backgroundTexture.Repeated = true;
+            background.Texture = backgroundTexture;
+            background.TextureRect = new IntRect(0,0,WIDTH,HEIGHT);           
+
+            // CLOCK
             Clock clock = new Clock();
             Clock timer = new Clock();
             float paddleSpeed = 300f;
             float ballSpeed = 200f;
             float horizontal = 1, vertical = 1;
 
-            // Start the game loop
+            // GAME LOOP
             while (window.IsOpen)
             {
                 float deltaTime = clock.Restart().AsSeconds();
@@ -74,7 +83,7 @@ namespace SharpPong
                 // Clear screen
                 window.Clear(windowColor);
                 
-                //MOVING PADDLE
+                // Moving player's paddle
                 if(Keyboard.IsKeyPressed(Keyboard.Key.Up) && paddleL.Position.Y > 5f)
                 {
                     paddleL.Position += new Vector2f(0f, -paddleSpeed * deltaTime);
@@ -84,28 +93,51 @@ namespace SharpPong
                     paddleL.Position += new Vector2f(0f, paddleSpeed * deltaTime);
                 }
 
-                //MOVING BALL                
+                // Moving computer's paddle
+                paddleR.Position += new Vector2f(0f, paddleSpeed * deltaTime * vertical);
+
+                // Moving ball               
                 ball.Position += new Vector2f(ballSpeed * deltaTime * horizontal, ballSpeed * deltaTime * vertical);
 
-                if (ball.Position.X < 10f || ball.Position.X > WIDTH - 10)
+                if (ball.Position.X > WIDTH)
                      horizontal *= -1;
                 if (ball.Position.Y < 10f || ball.Position.Y > HEIGHT - 10)
                     vertical *= -1;
 
-                Time time = timer.ElapsedTime;
+
+                // Checking collison between ball and left paddle (player)
+                if (ball.Position.X < paddleL.Position.X + paddleL.Size.X &&
+                    ball.Position.X > paddleL.Position.X &&
+                    ball.Position.Y > paddleL.Position.Y && 
+                    ball.Position.Y < paddleL.Position.Y + paddleL.Size.Y)
+                        horizontal *= -1;
+                if (ball.Position.X < 0f)
+                    ball.Position = new Vector2f(WIDTH/2, HEIGHT/2);
+
                 
+                // Checking collison between ball and right paddle (computer)
+                if (ball.Position.X < paddleR.Position.X &&
+                    ball.Position.X > paddleR.Position.X + paddleR.Size.X &&
+                    ball.Position.Y > paddleR.Position.Y &&
+                    ball.Position.Y < paddleR.Position.Y + paddleR.Size.Y)
+                        horizontal *= -1;
+                if (ball.Position.X > WIDTH)
+                    ball.Position = new Vector2f(WIDTH / 2, HEIGHT / 2);
+                    
+
+                Time time = timer.ElapsedTime;
+                String timeS = time.AsSeconds().ToString();
+                text.DisplayedString = timeS;
+
+                // Displaying everything on screen
+                window.Draw(background);
                 window.Draw(paddleL);
                 window.Draw(paddleR);
                 window.Draw(ball);
-
-                //DISPLAYING TIME
-                String time2 = time.AsSeconds().ToString();
-                text.DisplayedString = time2;
                 window.Draw(text);
 
                 // Update the window
-                window.Display();
-                            
+                window.Display();                            
             }
         }
     }
