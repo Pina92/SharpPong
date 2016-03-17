@@ -8,8 +8,8 @@ namespace SharpPong
 {
     class Player
     {
-        string name { set; get; }
-        int score { set; get; }
+        public string name { set; get; }
+        public int score { set; get; }
         // + keys(?)
 
         public Player(string name, int score)

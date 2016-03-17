@@ -14,13 +14,17 @@ namespace SharpPong
         int level;
         Ball ball;
         public RectangleShape paddleL, paddleR;
+        public Player playerL, playerR;
         Clock clock;
+
 
         public Game(int level)
         {
             this.level = level;
             this.clock = new Clock();
             this.ball = new Ball(14, 200); //  temporarily
+            this.playerL = new Player("PlayerA", 0);
+            this.playerR = new Player("PlayerB", 0);
 
             // Left paddle
             Texture paddleTexture = new Texture("textures/paddle2.png");
@@ -35,6 +39,7 @@ namespace SharpPong
             paddleR.Position = new Vector2f(800- paddleR.Size.X - 10, 600 / 2 - paddleR.Size.Y / 2);
         }
 
+        // Increase game level after one or two minutes playing.
         public void LevelUp()
         {
             level++;
@@ -43,7 +48,7 @@ namespace SharpPong
             
         }
 
-
+        // Handling paddles and ball movement. 
         public void move(float deltaTime)
         {
             float paddleSpeed = 300f;
@@ -59,22 +64,30 @@ namespace SharpPong
             }
 
             // Moving computer's paddle
-            paddleR.Position += new Vector2f(0f, paddleSpeed * deltaTime * ball.horizontal);
+            if (ball.ballShape.Position.Y < paddleR.Position.Y + paddleR.Size.Y/2 && paddleR.Position.Y > 5f)
+                paddleR.Position += new Vector2f(0f, paddleSpeed * deltaTime * (-1));
+            else if(ball.ballShape.Position.Y > paddleR.Position.Y + paddleR.Size.Y / 2 && paddleR.Position.Y < 600 - (paddleR.Size.Y + 5))
+                paddleR.Position += new Vector2f(0f, paddleSpeed * deltaTime * 1);
+           
+            int winner = ball.moving(deltaTime, paddleL, paddleR);
 
-            ball.moving(deltaTime, paddleL, paddleR);
-    
+            // Gaining point
+            if (winner == -1)
+                playerL.score += 1;
+            else if(winner == 1)
+                playerR.score += 1;               
         }
 
-
+        // Returning game time 
         public string getTime()
         {
             Time time = clock.ElapsedTime;
-            String timeS = time.AsSeconds().ToString();
+            String timeS = Math.Round(time.AsSeconds(), 2).ToString();
 
             return timeS;
         }
 
-
+        // Retutning ball
         public CircleShape getBall()
         {
             return ball.ballShape;

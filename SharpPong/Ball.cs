@@ -29,14 +29,12 @@ namespace SharpPong
 
         }
 
-        //poruszanie się piłeczki + zwrócenie true jeśli nastąpi przegrana
-        public bool moving(float deltaTime, RectangleShape paddleL, RectangleShape paddleR)
+        // Moving a ball + returning '1' if player on the right side wins or '-1' if player on the left side wins ('0' if nobody wins) 
+        public int moving(float deltaTime, RectangleShape paddleL, RectangleShape paddleR)
         {
             ballShape.Position += new Vector2f(speed * deltaTime * horizontal, speed * deltaTime * vertical);
 
-            if (ballShape.Position.X > 800)
-                horizontal *= -1;
-            if (ballShape.Position.Y < 10f || ballShape.Position.Y > 600 - 10)
+            if (ballShape.Position.Y < 10f || ballShape.Position.Y > 600 - 10 - size)
                 vertical *= -1;
 
             // Checking collison between ball and left paddle (player)
@@ -48,23 +46,22 @@ namespace SharpPong
             if (ballShape.Position.X < 0f)
             {
                 ballShape.Position = new Vector2f(800 / 2, 600 / 2);
-                return true;
+                return 1;
             }
 
-
             // Checking collison between ball and right paddle (computer)
-            if (ballShape.Position.X < paddleR.Position.X &&
-                ballShape.Position.X > paddleR.Position.X + paddleR.Size.X &&
+            if (ballShape.Position.X + size < paddleR.Position.X + paddleR.Size.X &&
+                ballShape.Position.X + size > paddleR.Position.X &&
                 ballShape.Position.Y > paddleR.Position.Y &&
                 ballShape.Position.Y < paddleR.Position.Y + paddleR.Size.Y)
-                horizontal *= -1;
+                    horizontal *= -1;
             if (ballShape.Position.X > 800)
             {
                 ballShape.Position = new Vector2f(800 / 2, 600 / 2);
-                return true;
+                return -1;
             }
 
-            return false;
+            return 0;
         }
 
     }
