@@ -13,6 +13,9 @@ namespace SharpPong
         int winningScore;
         string keysP1, keysP2;
 
+        public readonly static uint WIDTH = 800;
+        public readonly static uint HEIGHT = 600;
+
         public Settings()
         {
 

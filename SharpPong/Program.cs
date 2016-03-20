@@ -22,69 +22,37 @@ namespace SharpPong
 
         static void Main(string[] args)
         {
-            const int WIDTH = 800;
-            const int HEIGHT = 600; 
-            
+           
             // Window
             ContextSettings settings = new ContextSettings();
             settings.AntialiasingLevel = 8;
 
-            RenderWindow window = new RenderWindow(new VideoMode(WIDTH, HEIGHT), "#Pong", Styles.Default, settings);
+            RenderWindow window = new RenderWindow(new VideoMode(Settings.WIDTH, Settings.HEIGHT), "#Pong", Styles.Default, settings);
             window.Closed += new EventHandler(OnClose);
             Color windowColor = new Color(0, 192, 255);          
-
+            
             // Text
             Text time = new Text("0.0", new Font("robotastic.ttf"));
-            time.Position = new Vector2f(WIDTH - 90, 10);
+            time.Position = new Vector2f(Settings.WIDTH - 90, 10);
             time.CharacterSize = 18;
             time.Color = new Color(255, 255, 255, 170);
 
             Text score = new Text("0:0", new Font("robotastic.ttf"));
-            score.Position = new Vector2f(WIDTH / 2 - 30, 10);
+            score.Position = new Vector2f(Settings.WIDTH / 2 - 30, 10);
             score.CharacterSize = 22;
             score.Color = new Color(255, 255, 255, 170);
 
             // Background
             Texture backgroundTexture = new Texture("textures/background.png");
-            RectangleShape background = new RectangleShape(new Vector2f(WIDTH, HEIGHT));
+            RectangleShape background = new RectangleShape(new Vector2f(Settings.WIDTH, Settings.HEIGHT));
             backgroundTexture.Repeated = true;
             background.Texture = backgroundTexture;
-            background.TextureRect = new IntRect(0,0,WIDTH,HEIGHT);           
-
-            // Clock
-            Clock clock = new Clock();
+            background.TextureRect = new IntRect(0, 0, (int)Settings.WIDTH, (int)Settings.HEIGHT);           
 
             // Creating new game
             Game game = new Game(1);
+            game.run(window, time, score, background);
 
-            // Game loop
-            while (window.IsOpen)
-            {
-                float deltaTime = clock.Restart().AsSeconds();
-
-                // Process events
-                window.DispatchEvents();
-
-                // Clear screen
-                window.Clear(windowColor);
- 
-                game.move(deltaTime);
-
-                // Displaying everything on screen
-                time.DisplayedString =  game.getTime();
-                score.DisplayedString = game.playerL.score.ToString() + " : " + game.playerR.score.ToString();
-                CircleShape ball = game.getBall();
-             
-                window.Draw(background);
-                window.Draw(game.paddleL);
-                window.Draw(game.paddleR);
-                window.Draw(ball);
-                window.Draw(time);
-                window.Draw(score);
-
-                // Update the window
-                window.Display();                            
-            }
         }
     }
 }
