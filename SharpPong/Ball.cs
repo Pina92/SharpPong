@@ -29,7 +29,7 @@ namespace SharpPong
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         // Moving a ball + returning '1' if player on the right side wins or '-1' if player on the left side wins ('0' if nobody wins) 
-        public int moving(float deltaTime, RectangleShape paddleL, RectangleShape paddleR)
+        public int movingPong(float deltaTime, RectangleShape paddleL, RectangleShape paddleR)
         {
             ballShape.Position += new Vector2f(speed * deltaTime * horizontal, speed * deltaTime * vertical);
 
@@ -63,6 +63,30 @@ namespace SharpPong
             }
 
             return 0;
+        }
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+        //Return true if player don't hit the ball and loose 
+        public bool movingArkanoid(float deltaTime, RectangleShape paddle)
+        {
+            ballShape.Position += new Vector2f(speed * deltaTime * horizontal, speed * deltaTime * vertical);
+
+            if (ballShape.Position.X < 0f || ballShape.Position.X > Settings.WIDTH - size)
+                horizontal *= -1;
+
+            // Checking collison between ball and paddle or top wall 
+            if (ballShape.Position.X < paddle.Position.X + paddle.Size.X &&
+                ballShape.Position.X > paddle.Position.X &&
+                ballShape.Position.Y + ballShape.Radius > paddle.Position.Y ||
+                ballShape.Position.Y < 0f)
+                    vertical *= -1;
+            
+            if (ballShape.Position.Y > Settings.HEIGHT)
+            {
+                ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
+                return true;
+            }
+
+            return false;
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
     }

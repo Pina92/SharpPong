@@ -8,21 +8,24 @@ using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
 
+
 namespace SharpPong
 {
     class Program
     {
-        
+//------------------------------------------------------------------------------------------------------------------------------------------       
         static void OnClose(object sender, EventArgs e)
         {
             // Close the window when OnClose event is received
             RenderWindow window = (RenderWindow)sender;
             window.Close();
         }
+//------------------------------------------------------------------------------------------------------------------------------------------
 
         static void Main(string[] args)
         {
            
+
             // Window
             ContextSettings settings = new ContextSettings();
             settings.AntialiasingLevel = 8;
@@ -51,8 +54,9 @@ namespace SharpPong
 
             // Creating new game
             Game game = new Game(1);
-            game.run(window, time, score, background);
+            game.run(window, time, score, background, 2);
 
         }
+//------------------------------------------------------------------------------------------------------------------------------------------
     }
 }

@@ -12,13 +12,19 @@ namespace SharpPong
     class Game
     {
         int level;
-        Ball ball;
-        public RectangleShape paddleL, paddleR;
         public Player playerL, playerR;
+        Tiles tiles;
+
+        // Ball and paddles
+        Ball ball;
+        public RectangleShape paddleL, paddleR, paddle;
+        float paddleSpeed = 300f;
+        
+        // Time
         Clock clock, timer;
         float deltaTime;
-        float delay = 0;
-        //----------------------------------------------------------------------------------------------------------------------------------------------------
+        float delay = 0;              
+//----------------------------------------------------------------------------------------------------------------------------------------------------
         public Game(int level)
         {
             this.level = level;
@@ -39,6 +45,15 @@ namespace SharpPong
             this.paddleR = new RectangleShape(new Vector2f(20, 120));
             paddleR.Texture = paddleTexture;
             paddleR.Position = new Vector2f(Settings.WIDTH - paddleR.Size.X - 10, Settings.HEIGHT / 2 - paddleR.Size.Y / 2);
+
+            // Paddle (Arkanoid)
+            this.paddle = new RectangleShape(new Vector2f(120, 20));
+            paddle.Texture = paddleTexture;
+            paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X , Settings.HEIGHT - paddle.Size.Y - 10);
+
+            // Reading tiles (Arkanoid)
+            this.tiles = new Tiles(97, 30);
+            tiles.readTiles();
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         // Increase game level after one or two minutes playing
@@ -49,9 +64,8 @@ namespace SharpPong
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------       
         // Handling paddles and ball movement
-        public void move()
+        public void movePong()
         {
-            float paddleSpeed = 300f;
             Random rnd = new Random();
             
             // Moving player's paddle
@@ -74,7 +88,7 @@ namespace SharpPong
             else if(ball.ballShape.Position.Y > paddleR.Position.Y + paddleR.Size.Y / 2 && paddleR.Position.Y < Settings.HEIGHT - (paddleR.Size.Y + 5))
                 paddleR.Position += new Vector2f(0f, (paddleSpeed - delay) * deltaTime * 1);
 
-            int winner = ball.moving(deltaTime, paddleL, paddleR);
+            int winner = ball.movingPong(deltaTime, paddleL, paddleR);
 
             // Gaining point
             if (winner == -1)
@@ -83,9 +97,24 @@ namespace SharpPong
                 playerR.score += 1;               
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
-        // Running game
-        public void run(RenderWindow window, Text time, Text score, RectangleShape background)
+        public void moveArkanoid()
         {
+            // Moving player's paddle
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Left) && paddle.Position.X > 5f)
+            {
+                paddle.Position += new Vector2f(-paddleSpeed * deltaTime, 0f );
+            }
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Right) && paddle.Position.X < Settings.WIDTH - (paddle.Size.X + 5))
+            {
+                paddle.Position += new Vector2f(paddleSpeed * deltaTime, 0f);
+            }
+
+            bool loose = ball.movingArkanoid(deltaTime, paddle);
+        }
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+        // Running game
+        public void run(RenderWindow window, Text time, Text score, RectangleShape background, int type)
+        {       
             // Game loop
             while (window.IsOpen)
             {
@@ -94,24 +123,47 @@ namespace SharpPong
                 // Process events
                 window.DispatchEvents();
 
-                // Move paddles and ball
-                move();
-
-                // Increase the level after 15 seconds 
-                if (getTime() % 15 == 0)
-                    LevelUp();           
-
-                // Display everything on screen
-                time.DisplayedString = getTime().ToString();
-                score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
-                CircleShape ballObject = getBall();
-
                 window.Draw(background);
-                window.Draw(paddleL);
-                window.Draw(paddleR);
-                window.Draw(ballObject);
+                //**********************************************************
+                // Ping Pong
+                if (type == 1)
+                {
+                    // Move paddles and ball
+                    movePong();
+
+                    // Increase the level after 15 seconds 
+                    if (getTime() % 15 == 0)
+                        LevelUp();
+                  
+                    // Display paddles
+                    window.Draw(paddleL);
+                    window.Draw(paddleR);
+                    // Display player's score
+                    score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
+                    window.Draw(score);
+                }
+                //**********************************************************
+                // Arkanoid
+                else if (type == 2)
+                {
+                    // Move player paddle and ball
+                    moveArkanoid();
+
+                    // Display paddle
+                    window.Draw(paddle);
+                    // Display tiles
+                    for (int x = 0; x < tiles.xTab; x++)
+                        for (int y = 0; y < tiles.yTab; y++)
+                            if (tiles.tileMap[x, y] == 49)
+                                window.Draw(tiles.tiles[x, y]);
+                }
+                //**********************************************************
+                                                       
+                // Display everything on screen                                                            
+                time.DisplayedString = getTime().ToString();
                 window.Draw(time);
-                window.Draw(score);
+                CircleShape ballObject = getBall();
+                window.Draw(ballObject);
 
                 // Update the window
                 window.Display();
