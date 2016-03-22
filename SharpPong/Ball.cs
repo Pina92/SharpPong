@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SFML.System;
 using SFML.Graphics;
 
+
 namespace SharpPong
 {
     class Ball
@@ -21,7 +22,7 @@ namespace SharpPong
             this.speed = speed;
             this.ballShape = new CircleShape(size);
 
-            Texture ballTexture = new Texture("textures/ball2.png");
+            Texture ballTexture = new Texture("textures/ball.png");
             ballTexture.Smooth = true;
             this.ballShape.Texture = ballTexture;
 
@@ -66,7 +67,7 @@ namespace SharpPong
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         //Return true if player don't hit the ball and loose 
-        public bool movingArkanoid(float deltaTime, RectangleShape paddle)
+        public bool movingArkanoid(float deltaTime, RectangleShape paddle, Tiles tiles)
         {
             ballShape.Position += new Vector2f(speed * deltaTime * horizontal, speed * deltaTime * vertical);
 
@@ -82,8 +83,24 @@ namespace SharpPong
             
             if (ballShape.Position.Y > Settings.HEIGHT)
             {
-                ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
+                ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);                
                 return true;
+            }
+
+            // Checking if ball hits one of tiles
+            int x = (int)Math.Floor(ballShape.Position.X / tiles.sizeX);
+            int y = (int)Math.Floor((ballShape.Position.Y - tiles.sizeY) / tiles.sizeY);
+
+            if (x >= 0 && y < tiles.yTab && y >= 0 && x < tiles.xTab && tiles.tileMap[x,y] == 49 )
+            {
+                tiles.tileMap[x, y] = 0;
+                vertical *= -1;
+            }
+            if (x >= 0 && y < tiles.yTab && y >= 0 && x < tiles.xTab && tiles.tileMap[x, y] == 50)
+            {
+                tiles.tileMap[x, y] = 49;
+                vertical *= -1;
+                tiles.tiles[x, y].Texture = new Texture("textures/brick2.png");
             }
 
             return false;

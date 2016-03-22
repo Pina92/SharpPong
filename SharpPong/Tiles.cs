@@ -23,8 +23,8 @@ namespace SharpPong
             this.sizeX = sizeX;
             this.sizeY = sizeY;
 
-            this.tileTexture = new Texture("textures/tile.png");
-            tileTexture.Smooth = true;
+            //this.tileTexture = new Texture("textures/brick0.png");
+            //tileTexture.Smooth = true;
 
             this.xTab = (int)Math.Floor((double)((Settings.WIDTH - 20) / sizeX));
             this.yTab = (int)Math.Floor((double)((Settings.HEIGHT / 2) / sizeY));
@@ -51,11 +51,19 @@ namespace SharpPong
                     int temp = Convert.ToInt32(ch);
                     tileMap[x, y] = temp;
 
-                    RectangleShape tile = new RectangleShape(new Vector2f(sizeX, sizeY));
+                    RectangleShape tile = new RectangleShape(new Vector2f(sizeX - 5, sizeY - 5));
                     tile.Position = new Vector2f(posX, posY);
 
-                    if (temp == 49)   
+                    if (temp == 49)
+                    {
+                        tileTexture = new Texture("textures/brick0.png");
                         tile.Texture = tileTexture;
+                    }
+                    else if (temp == 50)
+                    {
+                        tileTexture = new Texture("textures/brick1.png");
+                        tile.Texture = tileTexture;
+                    }
 
                     tiles[x, y] = tile;
 

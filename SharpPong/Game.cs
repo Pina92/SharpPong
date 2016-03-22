@@ -52,7 +52,7 @@ namespace SharpPong
             paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X , Settings.HEIGHT - paddle.Size.Y - 10);
 
             // Reading tiles (Arkanoid)
-            this.tiles = new Tiles(97, 30);
+            this.tiles = new Tiles(97, 35);
             tiles.readTiles();
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -109,7 +109,8 @@ namespace SharpPong
                 paddle.Position += new Vector2f(paddleSpeed * deltaTime, 0f);
             }
 
-            bool loose = ball.movingArkanoid(deltaTime, paddle);
+            bool loose = ball.movingArkanoid(deltaTime, paddle, tiles);
+    
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         // Running game
@@ -154,7 +155,7 @@ namespace SharpPong
                     // Display tiles
                     for (int x = 0; x < tiles.xTab; x++)
                         for (int y = 0; y < tiles.yTab; y++)
-                            if (tiles.tileMap[x, y] == 49)
+                            if (tiles.tileMap[x, y] == 49 || tiles.tileMap[x, y] == 50)
                                 window.Draw(tiles.tiles[x, y]);
                 }
                 //**********************************************************
@@ -175,7 +176,7 @@ namespace SharpPong
         {
             Time temp = timer.ElapsedTime;
             double time = Math.Round(temp.AsSeconds(), 2);
-
+             
             return time;
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
