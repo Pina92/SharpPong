@@ -30,7 +30,7 @@ namespace SharpPong
             this.level = level;
             this.clock = new Clock();
             this.timer = new Clock();
-            this.ball = new Ball(14, 200); //  temporarily
+            this.ball = new Ball(14, 270); //  temporarily
             this.playerL = new Player("PlayerA", 0);
             this.playerR = new Player("PlayerB", 0);
 
@@ -99,17 +99,24 @@ namespace SharpPong
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         public void moveArkanoid()
         {
+            // moving = -1 (paddle moving left)
+            // moving = 1  (paddle moving right)
+            // moving = 0  (paddle is not moving)
+            int moving = 0;
+
             // Moving player's paddle
             if (Keyboard.IsKeyPressed(Keyboard.Key.Left) && paddle.Position.X > 5f)
             {
                 paddle.Position += new Vector2f(-paddleSpeed * deltaTime, 0f );
+                moving = -1;
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Right) && paddle.Position.X < Settings.WIDTH - (paddle.Size.X + 5))
             {
                 paddle.Position += new Vector2f(paddleSpeed * deltaTime, 0f);
+                moving = 1;
             }
 
-            bool loose = ball.movingArkanoid(deltaTime, paddle, tiles);
+            bool loose = ball.movingArkanoid(deltaTime, paddle, tiles, moving);
     
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
