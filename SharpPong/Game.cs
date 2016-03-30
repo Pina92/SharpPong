@@ -14,6 +14,9 @@ namespace SharpPong
         int level;
         public Player playerL, playerR;
         Tiles tiles;
+        bool loose;
+        int seconds;
+        Text counting;
 
         // Ball and paddles
         Ball ball;
@@ -30,9 +33,10 @@ namespace SharpPong
             this.level = level;
             this.clock = new Clock();
             this.timer = new Clock();
-            this.ball = new Ball(14, 270); //  temporarily
+            this.ball = new Ball(14, 300); //  temporarily
             this.playerL = new Player("PlayerA", 0);
             this.playerR = new Player("PlayerB", 0);
+            this.loose = false;
 
             // Left paddle
             Texture paddleTexture = new Texture("textures/paddle2.png");
@@ -50,6 +54,12 @@ namespace SharpPong
             this.paddle = new RectangleShape(new Vector2f(120, 20));
             paddle.Texture = paddleTexture;
             paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X , Settings.HEIGHT - paddle.Size.Y - 10);
+
+            // Counting
+            this.counting = new Text("", new Font("robotastic.ttf"));
+            counting.Position = new Vector2f(Settings.WIDTH / 2 - 15, Settings.HEIGHT / 2 - 50);
+            counting.CharacterSize = 50;
+            counting.Color = new Color(255, 255, 255, 170);
 
             // Reading tiles (Arkanoid)
             this.tiles = new Tiles(97, 35);
@@ -99,25 +109,18 @@ namespace SharpPong
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         public void moveArkanoid()
         {
-            // moving = -1 (paddle moving left)
-            // moving = 1  (paddle moving right)
-            // moving = 0  (paddle is not moving)
-            int moving = 0;
-
             // Moving player's paddle
             if (Keyboard.IsKeyPressed(Keyboard.Key.Left) && paddle.Position.X > 5f)
-            {
                 paddle.Position += new Vector2f(-paddleSpeed * deltaTime, 0f );
-                moving = -1;
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Right) && paddle.Position.X < Settings.WIDTH - (paddle.Size.X + 5))
-            {
+            
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Right) && paddle.Position.X < Settings.WIDTH - (paddle.Size.X + 5))            
                 paddle.Position += new Vector2f(paddleSpeed * deltaTime, 0f);
-                moving = 1;
-            }
+            
+            // Moving the ball
+            loose = ball.movingArkanoid(deltaTime , paddle, tiles);
 
-            bool loose = ball.movingArkanoid(deltaTime, paddle, tiles, moving);
-    
+            seconds = DateTime.Now.Second;
+
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
         // Running game
@@ -154,16 +157,45 @@ namespace SharpPong
                 // Arkanoid
                 else if (type == 2)
                 {
+                    
                     // Move player paddle and ball
-                    moveArkanoid();
+                    if (!loose)
+                        moveArkanoid();
+                    // Time delaying when player loose  
+                    else
+                    {
+                        if (DateTime.Now.Second - seconds == 1)
+                        {
+                            counting.DisplayedString = "3";
+                            window.Draw(counting);
+                        }
+                        else if (DateTime.Now.Second - seconds == 2)
+                        {
+                            counting.DisplayedString = "2";
+                            window.Draw(counting);
+                        }
+                        else if (DateTime.Now.Second - seconds == 3)
+                        {
+                            counting.DisplayedString = "1";
+                            window.Draw(counting);
+                        }
+                        else if (DateTime.Now.Second - seconds == 4)
+                        {
+                            counting.DisplayedString = "0";
+                            window.Draw(counting);
+                            loose = false;
+                        }
+                    }                       
 
                     // Display paddle
                     window.Draw(paddle);
+                    
                     // Display tiles
                     for (int x = 0; x < tiles.xTab; x++)
-                        for (int y = 0; y < tiles.yTab; y++)
-                            if (tiles.tileMap[x, y] == 49 || tiles.tileMap[x, y] == 50)
+                       for (int y = 0; y < tiles.yTab; y++)
+                           if (tiles.tileMap[x, y] == 49 || tiles.tileMap[x, y] == 50)
                                 window.Draw(tiles.tiles[x, y]);
+
                 }
                 //**********************************************************
                                                        
@@ -175,6 +207,7 @@ namespace SharpPong
 
                 // Update the window
                 window.Display();
+
             }
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
