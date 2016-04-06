@@ -96,25 +96,22 @@ namespace SharpPong
             }
 
             // Checking collison between the ball and paddle 
-            // and changing ball angle and speed according to the paddle movement
             if (ballShape.Position.X <= paddle.Position.X + paddle.Size.X &&
                 ballShape.Position.X + ballShape.Radius >= paddle.Position.X &&
                 ballShape.Position.Y + ballShape.Radius >= paddle.Position.Y &&
                 ballShape.Position.Y + ballShape.Radius <= paddle.Position.Y + paddle.Size.Y)
-            {               
+            {
                 // Changing ball angle according to the possition where it hits
-                if (ballShape.Position.X + ballShape.Radius <= paddle.Position.X + paddle.Size.X / 2)
-                    angle = (270 + (ballShape.Position.X + ballShape.Radius - paddle.Position.X) / (paddle.Size.X / 2) * 90) * (float)Math.PI / 180;                 
-                else 
-                    angle = (ballShape.Position.X + ballShape.Radius - paddle.Position.X - paddle.Size.X / 2) / (paddle.Size.X / 2) * 90 * (float)Math.PI / 180;                                    
-
-                horizontal = 1;
+                const float MAX_ANGLE = 75;
+                float PADDLE_HALF_WIDTH = paddle.Size.X / 2;
+                angle = ((paddle.Position.X + PADDLE_HALF_WIDTH) - (ballShape.Position.X + ballShape.Radius)) / PADDLE_HALF_WIDTH * MAX_ANGLE * (float)Math.PI / 180;
+                
+                horizontal = -1;
                 vertical *= -1;
 
                 ballShape.Position = new Vector2f(ballShape.Position.X, paddle.Position.Y - ballShape.Radius);
                
             }
-
            
          
             // Game over 
@@ -137,7 +134,7 @@ namespace SharpPong
             {
                 tiles.tileMap[x, y] = 0;
                 vertical *= -1;
-                horizontal *= -1;
+                //horizontal *= -1;
             }
             if (x >= 0 && y < tiles.yTab && y >= 0 && x < tiles.xTab && tiles.tileMap[x, y] == 50)
             {

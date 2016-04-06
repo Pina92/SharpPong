@@ -164,27 +164,20 @@ namespace SharpPong
                     // Time delaying when player loose  
                     else
                     {
+                        counting.DisplayedString = "3";
+
                         if (DateTime.Now.Second - seconds == 1)
-                        {
-                            counting.DisplayedString = "3";
-                            window.Draw(counting);
-                        }
-                        else if (DateTime.Now.Second - seconds == 2)
-                        {
                             counting.DisplayedString = "2";
-                            window.Draw(counting);
-                        }
-                        else if (DateTime.Now.Second - seconds == 3)
-                        {
+
+                        else if (DateTime.Now.Second - seconds == 2)
                             counting.DisplayedString = "1";
-                            window.Draw(counting);
-                        }
-                        else if (DateTime.Now.Second - seconds == 4)
+
+                        else if (DateTime.Now.Second - seconds >= 3 || DateTime.Now.Second - seconds < 0)
                         {
                             counting.DisplayedString = "0";
-                            window.Draw(counting);
                             loose = false;
                         }
+   
                     }                       
 
                     // Display paddle
@@ -204,7 +197,9 @@ namespace SharpPong
                 window.Draw(time);
                 CircleShape ballObject = getBall();
                 window.Draw(ballObject);
-
+                if(loose)
+                    window.Draw(counting);
+                
                 // Update the window
                 window.Display();
 
