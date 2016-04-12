@@ -16,15 +16,11 @@ namespace SharpPong
         public RectangleShape[,] tiles;
         public int sizeX, sizeY; // tile size
         Texture tileTexture; 
-        //public int hits;
 
         public Tiles(int sizeX, int sizeY)
         {
             this.sizeX = sizeX;
             this.sizeY = sizeY;
-
-            //this.tileTexture = new Texture("textures/brick0.png");
-            //tileTexture.Smooth = true;
 
             this.xTab = (int)Math.Floor((double)((Settings.WIDTH - 20) / sizeX));
             this.yTab = (int)Math.Floor((double)((Settings.HEIGHT / 2) / sizeY));
@@ -36,7 +32,7 @@ namespace SharpPong
         // Read tiles from file 
         public void readTiles()
         {
-            char ch;
+
             int posX = 0, posY = 10;
             StreamReader reader = new StreamReader("map.txt");
            
@@ -47,7 +43,7 @@ namespace SharpPong
 
                 for (int x = 0; x < xTab; x++)
                 {
-                    ch = (char)reader.Read();
+                    char ch = (char)reader.Read();
                     int temp = Convert.ToInt32(ch);
                     tileMap[x, y] = temp;
 
