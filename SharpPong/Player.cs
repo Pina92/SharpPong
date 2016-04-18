@@ -8,9 +8,9 @@ namespace SharpPong
 {
     class Player
     {
-        public string name { set; get; }
-        public int score { set; get; }
-        // + keys(?)
+        public string name;
+        public int score;
+        
 
         public Player(string name, int score)
         {

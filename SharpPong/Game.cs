@@ -42,7 +42,8 @@ namespace SharpPong
             this.playerL = new Player("PlayerA", 0);
             this.playerR = new Player("PlayerB", 0);
 
-            this.loose = false;
+            this.loose = true;
+            this.seconds = DateTime.Now.Second;
 
             // Counting
             this.counting = new Text("", new Font("robotastic.ttf"));
@@ -70,7 +71,7 @@ namespace SharpPong
         // Running game
         public void run(RenderWindow window, Text time, Text score, RectangleShape background, int type)
         {
-            window.SetKeyRepeatEnabled(false);
+            
             // Game loop
             while (window.IsOpen)
             {
@@ -123,10 +124,6 @@ namespace SharpPong
                 CircleShape ballObject = getBall();
                 window.Draw(ballObject);
 
-                // Counting 
-                if (loose)
-                    window.Draw(counting);
-
                 // Player's score
                 score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
                 window.Draw(score);
@@ -134,8 +131,12 @@ namespace SharpPong
                 // Paddles, objects for specific game, etc. 
                 displayRest(window);
 
+                // Counting 
+                if (loose)
+                    window.Draw(counting);
+
                 //**********************************************************
-                
+
                 // Update the window
                 window.Display();
 
@@ -154,7 +155,7 @@ namespace SharpPong
 
         }
         //----------------------------------
-        // Retutning ball
+        // Returning ball
         public CircleShape getBall()
         {
 

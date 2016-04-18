@@ -12,7 +12,7 @@ namespace SharpPong
     class Arkanoid : Game
     {
         Tiles tiles;
-        public RectangleShape paddle;
+        private RectangleShape paddle;
         //----------------------------------------------------------------------------------------------
         public Arkanoid()
         {

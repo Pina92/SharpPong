@@ -26,14 +26,13 @@ namespace SharpPong
         static void Main(string[] args)
         {
            
-
             // Window
             ContextSettings settings = new ContextSettings();
             settings.AntialiasingLevel = 8;
 
             RenderWindow window = new RenderWindow(new VideoMode(Settings.WIDTH, Settings.HEIGHT), "#Pong", Styles.Default, settings);
             window.Closed += new EventHandler(OnClose);
-            Color windowColor = new Color(0, 192, 255);          
+            Color windowColor = new Color(0, 192, 255);         
             
             // Text
             Text time = new Text("0.0", new Font("robotastic.ttf"));
@@ -54,14 +53,22 @@ namespace SharpPong
             background.TextureRect = new IntRect(0, 0, (int)Settings.WIDTH, (int)Settings.HEIGHT);
 
             // Display menu
-            menu(window, background);
+            string option = menu(window, background);
 
             // Creating new game
-            Arkanoid game = new Arkanoid();
-            game.run(window, time, score, background, 2);
+            if (option == "Pong") {
+                Pong pong = new Pong();
+                pong.run(window, time, score, background, 2);
+            }
+            else if (option == "Arkanoid") {
+                Arkanoid arkanoid = new Arkanoid();
+                arkanoid.run(window, time, score, background, 2);
+            }
+            else if (option == "Exit")
+                window.Close();
         }
         //----------------------------------------
-        static void menu(RenderWindow window, RectangleShape background)
+        static string menu(RenderWindow window, RectangleShape background)
         {
             
             // Creating menu 
@@ -82,40 +89,34 @@ namespace SharpPong
 
 
             bool play = false;
+            bool pressedNow = false;
             int i = 0;
-            Event keyEvent = new Event();
+            
             // Menu loop
             while (!play)
             {
-
-                /*if (keyEvent.GetType == Keyboard.IsKeyPressed())
-                {
-                    if (keyEvent.Key.Code == Keyboard.Key.Up)
-                    {
-                        
-                    }
-                    if (keyEvent.Key.Code == Keyboard.Key.Down)
-                    {
-                      
-                    }
-        
-                }*/
-
+               
                 menu[i].Color = Color.Blue;
-
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Up) && i >= 0)
+                
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Up) && i > 0 && !pressedNow)
                 {
                     menu[i].Color = Color.White;
                     i--;
+                    pressedNow = true;
+
                 }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Down) && i < menu.Length - 1)
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Down) && i < menu.Length - 1 && !pressedNow)
                 {
                     menu[i].Color = Color.White;
                     i++;
+                    pressedNow = true;
                 }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.LShift))
+                if (!Keyboard.IsKeyPressed(Keyboard.Key.Down) && !Keyboard.IsKeyPressed(Keyboard.Key.Up))
                 {
-
+                    pressedNow = false;
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Return))
+                {
                     break;
                 }
 
@@ -128,7 +129,11 @@ namespace SharpPong
                 window.Display();
 
             }
+
+            // Return the name of chosen position in menu
+            return menu[i].DisplayedString;
         }
         //----------------------------------------
+
     }
 }

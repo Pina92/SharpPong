@@ -12,8 +12,8 @@ namespace SharpPong
     class Ball
     {
         public CircleShape ballShape;
-        public float size { get; set; }
-        public float speed { get; set; }
+        public float size;
+        public float speed;
         public float horizontal = 1, vertical = 1;
         double angle;
         Random ran = new Random();
