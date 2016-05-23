@@ -46,7 +46,7 @@ namespace SharpPong
             this.seconds = DateTime.Now.Second;
 
             // Counting
-            this.counting = new Text("", new Font("robotastic.ttf"));
+            this.counting = new Text("", new Font("resources/robotastic.ttf"));
             counting.Position = new Vector2f(Settings.WIDTH / 2 - 15, Settings.HEIGHT / 2 - 50);
             counting.CharacterSize = 50;
             counting.Color = new Color(255, 255, 255, 170);

@@ -22,7 +22,7 @@ namespace SharpPong
 
             // Paddle
             this.paddle = new RectangleShape(new Vector2f(120, 20));
-            Texture paddleTexture = new Texture("textures/paddle2.png");
+            Texture paddleTexture = new Texture("resources/textures/paddle2.png");
             paddle.Texture = paddleTexture;
             paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X, Settings.HEIGHT - paddle.Size.Y - 10);
         }

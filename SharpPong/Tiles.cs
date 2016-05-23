@@ -34,7 +34,7 @@ namespace SharpPong
         {
 
             int posX = 0, posY = 10;
-            StreamReader reader = new StreamReader("map.txt");
+            StreamReader reader = new StreamReader("resources/map.txt");
            
             for (int y = 0; y < yTab; y++) 
             {
@@ -52,12 +52,12 @@ namespace SharpPong
 
                     if (temp == 49)
                     {
-                        tileTexture = new Texture("textures/brick0.png");
+                        tileTexture = new Texture("resources/textures/brick0.png");
                         tile.Texture = tileTexture;
                     }
                     else if (temp == 50)
                     {
-                        tileTexture = new Texture("textures/brick1.png");
+                        tileTexture = new Texture("resources/textures/brick1.png");
                         tile.Texture = tileTexture;
                     }
 

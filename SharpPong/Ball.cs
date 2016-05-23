@@ -25,7 +25,7 @@ namespace SharpPong
             this.ballShape = new CircleShape(size);
             this.angle = Math.PI * 45 / 180;
 
-            Texture ballTexture = new Texture("textures/ball.png");
+            Texture ballTexture = new Texture("resources/textures/ball.png");
             ballTexture.Smooth = true;
             this.ballShape.Texture = ballTexture;
 
@@ -140,7 +140,7 @@ namespace SharpPong
             {
                 tiles.tileMap[x, y] = 49;
                 vertical *= -1;
-                tiles.tiles[x, y].Texture = new Texture("textures/brick2.png");
+                tiles.tiles[x, y].Texture = new Texture("resources/textures/brick2.png");
             }
 
             return false;

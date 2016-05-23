@@ -14,6 +14,10 @@ namespace SharpPong
     class Program
     {
 
+        static ResourceManager resourceManager = new ResourceManager();
+        static Font robotasticF = resourceManager.GetFont("resources/robotastic.ttf");
+        static Texture backgroundT = resourceManager.getTexture("resources/textures/background.png");
+        
         //----------------------------------------       
         static void OnClose(object sender, EventArgs e)
         {
@@ -25,28 +29,29 @@ namespace SharpPong
 
         static void Main(string[] args)
         {
-           
+            
             // Window
             ContextSettings settings = new ContextSettings();
             settings.AntialiasingLevel = 8;
 
             RenderWindow window = new RenderWindow(new VideoMode(Settings.WIDTH, Settings.HEIGHT), "#Pong", Styles.Default, settings);
             window.Closed += new EventHandler(OnClose);
-            Color windowColor = new Color(0, 192, 255);         
-            
+            Color windowColor = new Color(0, 192, 255);
+
             // Text
-            Text time = new Text("0.0", new Font("robotastic.ttf"));
+            Text time = new Text("0.0", robotasticF);
+
             time.Position = new Vector2f(Settings.WIDTH - 90, 10);
             time.CharacterSize = 18;
             time.Color = new Color(255, 255, 255, 170);
 
-            Text score = new Text("0:0", new Font("robotastic.ttf"));
+            Text score = new Text("0:0", robotasticF);
             score.Position = new Vector2f(Settings.WIDTH / 2 - 30, 10);
             score.CharacterSize = 22;
             score.Color = new Color(255, 255, 255, 170);
 
             // Background
-            Texture backgroundTexture = new Texture("textures/background.png");
+            Texture backgroundTexture = backgroundT;
             RectangleShape background = new RectangleShape(new Vector2f(Settings.WIDTH, Settings.HEIGHT));
             backgroundTexture.Repeated = true;
             background.Texture = backgroundTexture;
@@ -60,9 +65,19 @@ namespace SharpPong
                 Pong pong = new Pong();
                 pong.run(window, time, score, background, 2);
             }
+            else if (option == "Hot-Seat")
+            {
+                PongHotSeat pongHotSeat = new PongHotSeat();
+                pongHotSeat.run(window, time, score, background, 2);
+            }
             else if (option == "Arkanoid") {
                 Arkanoid arkanoid = new Arkanoid();
                 arkanoid.run(window, time, score, background, 2);
+            }
+            else if (option == "Multiplayer")
+            {
+                Multiplayer multiplayer = new Multiplayer();
+               multiplayer.run(window, time, score, background, 2);
             }
             else if (option == "Exit")
                 window.Close();
@@ -72,14 +87,14 @@ namespace SharpPong
         {
             
             // Creating menu 
-            Text[] menu = new Text[3];
-            String[] list = { "Pong", "Arkanoid", "Exit" };
+            Text[] menu = new Text[5];
+            String[] list = { "Pong", "Hot-Seat", "Multiplayer", "Arkanoid", "Exit" };
 
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < 5; j++)
             {
-                Text position = new Text("0.0", new Font("robotastic.ttf"));
+                Text position = new Text("0.0", robotasticF);
                 position.DisplayedString = list[j];
-                position.Position = new Vector2f(Settings.WIDTH / 2 - 25, 250 + j * 120);
+                position.Position = new Vector2f(Settings.WIDTH / 2 - 25, 50 + j * 120);
                 position.CharacterSize = 25;
                 position.Color = new Color(255, 255, 255, 170);
 
