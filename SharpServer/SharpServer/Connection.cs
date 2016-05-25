@@ -81,7 +81,11 @@ namespace SharpServer
                 // 1 means connected successfully
                 sendPlayer1.WriteLine("1");
                 sendPlayer1.Flush();
+                sendPlayer1.WriteLine("Left");
+                sendPlayer1.Flush();
                 sendPlayer2.WriteLine("1");
+                sendPlayer2.Flush();
+                sendPlayer2.WriteLine("Right");
                 sendPlayer2.Flush();
 
 

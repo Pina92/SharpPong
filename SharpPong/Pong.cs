@@ -12,7 +12,7 @@ namespace SharpPong
     class Pong : Game
     {
         float delay = 0;
-        public RectangleShape paddleL, paddleR;
+        public RectangleShape paddle, paddleOp, paddleL, paddleR;
         //----------------------------------------------------------------------------------------------
         public Pong()
         {
@@ -27,23 +27,27 @@ namespace SharpPong
             this.paddleR = new RectangleShape(new Vector2f(20, 120));
             paddleR.Texture = paddleTexture;
             paddleR.Position = new Vector2f(Settings.WIDTH - paddleR.Size.X - 10, Settings.HEIGHT / 2 - paddleR.Size.Y / 2);
+
+            this.paddle = paddleL;
+            
+            //this.playerL.setPlayersKeys();
         }
         //----------------------------------------------------------------------------------------------
         public override void move()
         {
 
             // Moving player's paddle
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Up) && paddleL.Position.Y > 5f)
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Up) && paddle.Position.Y > 5f)
             {
-                paddleL.Position += new Vector2f(0f, -paddleSpeed * deltaTime);
+                paddle.Position += new Vector2f(0f, -paddleSpeed * deltaTime);
             }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Down) && paddleL.Position.Y < Settings.HEIGHT - (paddleL.Size.Y + 5))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Down) && paddle.Position.Y < Settings.HEIGHT - (paddle.Size.Y + 5))
             {
-                paddleL.Position += new Vector2f(0f, paddleSpeed * deltaTime);
+                paddle.Position += new Vector2f(0f, paddleSpeed * deltaTime);
             }
 
             // Moving opponent's paddle
-            moveOpponent();
+           /* moveOpponent();
 
             // Moving the ball
             int winner = ball.movingPong(deltaTime, paddleL, paddleR);
@@ -53,7 +57,7 @@ namespace SharpPong
                 playerL.score += 1;
             else if (winner == 1)
                 playerR.score += 1;
-
+             */   
             // TODO: Loosing game
 
         }

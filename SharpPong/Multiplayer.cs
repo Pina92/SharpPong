@@ -68,17 +68,32 @@ namespace SharpPong
             // Connection was successful
             if (serverMessage == "1")
             {
+                // Checking which player is on the left or right
+                serverMessage = receive.ReadLine();
+                if (serverMessage == "Left")
+                {
+                    paddle = paddleL;
+                    paddleOp = paddleR;
+                }
+                else if (serverMessage == "Right")
+                {
+                    paddle = paddleR;
+                    paddleOp = paddleL;
+                    
+                }
+                    
 
                 while (true)
                 {
                     // Receiving and updating the position of the opponent paddle
                     string[] coordinations = receive.ReadLine().Split(' ');
-                    float coordinationX = Convert.ToUInt64(coordinations[0]);
-                    float coordinationY = Convert.ToUInt64(coordinations[1]);
+                    float coordinationX = Convert.ToSingle(coordinations[0]);
+                    float coordinationY = Convert.ToSingle(coordinations[1]);
 
                     Console.WriteLine(coordinationX + " " + coordinationY);
 
-                    paddleR.Position = new Vector2f(paddleR.Position.X, coordinationY);
+                    // TO-DO bez new
+                    paddleOp.Position = new Vector2f(paddleOp.Position.X, coordinationY);
 
                 }
 
@@ -88,13 +103,23 @@ namespace SharpPong
         //------------------------------------------------------------------------
         private void sendMessage()
         {
-            // Send messages to server
+            float seconds2 = DateTime.Now.Second;
+            
+            // Sending messages to server
             while (true)
             {
-                // Sending the position of the player paddle
-                string message = paddleL.Position.X.ToString() + " " + paddleL.Position.Y.ToString();
-                send.WriteLine(message);
-                send.Flush();
+                // Send message after 0.1 seconds 
+                float delay = DateTime.Now.Second - seconds2;
+
+                if (delay > 0.2 || delay < 0)
+                {    
+                    // Sending the position of the player paddle
+                    string message = paddleL.Position.X.ToString() + " " + paddleL.Position.Y.ToString();
+                    send.WriteLine(message);
+                    send.Flush();
+                    seconds2 = DateTime.Now.Second;
+
+                }
 
             }
 

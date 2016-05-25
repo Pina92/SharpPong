@@ -42,7 +42,7 @@ namespace SharpPong
             this.playerL = new Player("PlayerA", 0);
             this.playerR = new Player("PlayerB", 0);
 
-            this.loose = true;
+            this.loose = false;
             this.seconds = DateTime.Now.Second;
 
             // Counting
