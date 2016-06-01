@@ -13,7 +13,7 @@ namespace SharpPong
     {
 
         int level;
-        public Player playerL, playerR;
+        public Player player1, playerR;
 
         // Ball and paddles
         public Ball ball;       
@@ -39,7 +39,8 @@ namespace SharpPong
 
             this.ball = new Ball(14, 300);
 
-            this.playerL = new Player("PlayerA", 0);
+            // Setting players
+            this.player1 = new Player("PlayerA", 0);
             this.playerR = new Player("PlayerB", 0);
 
             this.loose = false;
@@ -125,7 +126,7 @@ namespace SharpPong
                 window.Draw(ballObject);
 
                 // Player's score
-                score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
+                score.DisplayedString = player1.score.ToString() + " : " + playerR.score.ToString();
                 window.Draw(score);
 
                 // Paddles, objects for specific game, etc. 

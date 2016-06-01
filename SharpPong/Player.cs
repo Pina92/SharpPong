@@ -13,7 +13,7 @@ namespace SharpPong
     {
         public string name;
         public int score;
-        protected ArrayList keys;
+        public ArrayList keys;
         //-------------------------------------------------------------------
         public Player(string name, int score)
         {
@@ -25,11 +25,16 @@ namespace SharpPong
         //-------------------------------------------------------------------
         public void setPlayersKeys(string[] keystr)
         {
-
+            keys.Clear();
             for (int i = 0; i < keystr.Length; i++)
             {
                 Keyboard.Key key = (Keyboard.Key)Enum.Parse(typeof(Keyboard.Key), keystr[i]);
                 this.keys.Add(key);
+
+                foreach (Keyboard.Key j in keys)
+                {
+                    Console.WriteLine(j);
+                }
             }
             
         }

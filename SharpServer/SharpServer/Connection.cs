@@ -21,7 +21,7 @@ namespace SharpServer
         private StreamReader receivePlayer1, receivePlayer2;
         private StreamWriter sendPlayer1, sendPlayer2;
 
-        private Thread listener, messages;
+        private Thread messagesPlayer1, messagesPlayer2;
 
         private string dataPlayer1, dataPlayer2;
 
@@ -34,38 +34,19 @@ namespace SharpServer
         public void StartListening()
         {
 
-            IPAddress ipAddress = IPAddress.Parse("192.168.0.108");
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             connections = new TcpListener(ipAddress, 8001);         
             connections.Start(); // Start listening at the specified port
 
             Console.WriteLine("Waiting for a connection...");
 
-            // Start the new thread that hosts the listener
-            listener = new Thread(KeepListening);
-            listener.Start();
+            player1 = connections.AcceptTcpClient();
+            Console.WriteLine("Player1 joined the game.");
 
-        }
-        //-------------------------------------------------------------------
-        public void KeepListening()
-        {
+            player2 = connections.AcceptTcpClient();
+            Console.WriteLine("Player2 joined the game.");
 
-            while (true)
-            {
 
-                player1 = connections.AcceptTcpClient();
-                Console.WriteLine("Player1 joined the game.");
-                player2 = connections.AcceptTcpClient();
-                Console.WriteLine("Player2 joined the game.");
-
-                messages = new Thread(getMessages);
-                messages.Start();
- 
-            }
-
-        }
-        //-------------------------------------------------------------------
-        public void getMessages()
-        {
 
             receivePlayer1 = new StreamReader(player1.GetStream());
             sendPlayer1 = new StreamWriter(player1.GetStream());
@@ -88,28 +69,43 @@ namespace SharpServer
                 sendPlayer2.WriteLine("Right");
                 sendPlayer2.Flush();
 
-
-                Console.WriteLine(dataPlayer1 + " " + dataPlayer2);
             }
+
+
+            messagesPlayer1 = new Thread(getMessages1);
+            messagesPlayer1.Start();
+
+            messagesPlayer2 = new Thread(getMessages2);
+            messagesPlayer2.Start();
+
+        }
+        //-------------------------------------------------------------------
+        public void getMessages1()
+        {
 
             Console.WriteLine("Listening...");
 
             while (true)
             {
-
-                dataPlayer1 = receivePlayer1.ReadLine();
-                Console.WriteLine(dataPlayer1);
-
-                dataPlayer2 = receivePlayer2.ReadLine();
-                Console.WriteLine(dataPlayer2);
-
-                sendPlayer1.WriteLine(dataPlayer2);
-                sendPlayer1.Flush();
-                sendPlayer2.WriteLine(dataPlayer1);
-                sendPlayer2.Flush();
-
+                    dataPlayer1 = receivePlayer1.ReadLine();
+                    sendPlayer2.WriteLine(dataPlayer1);
+                    sendPlayer2.Flush();
             }
             
+        }
+        //-------------------------------------------------------------------
+        public void getMessages2()
+        {
+
+            Console.WriteLine("Listening...");
+
+            while (true)
+            {
+                dataPlayer2 = receivePlayer2.ReadLine();
+                sendPlayer1.WriteLine(dataPlayer2);
+                sendPlayer1.Flush();
+            }
+
         }
         //-------------------------------------------------------------------
     }
