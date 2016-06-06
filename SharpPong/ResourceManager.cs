@@ -23,7 +23,7 @@ namespace SharpPong
             textures = new Hashtable();
         }
         //-------------------------------------------------
-	    public Font GetFont(string font_path)
+        public Font GetFont(string font_path)
         {
 
             if (fonts.ContainsKey(font_path))

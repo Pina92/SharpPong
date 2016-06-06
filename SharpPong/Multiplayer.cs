@@ -19,7 +19,8 @@ namespace SharpPong
 
         public Multiplayer()
         {
-            startConnection();
+           gameOn = false;
+           startConnection();
         }
 
         // Player informations
@@ -29,63 +30,68 @@ namespace SharpPong
         private StreamWriter send;
         private StreamReader receive;
 
-        private Thread messaging, sending, moving;
+        private Thread sending, moving, waiting;
+        string serverMessage;
+
         //------------------------------------------------------------------------
         public void startConnection()
         {
-            // Nawiazanie polaczenia z serverem
+            // Establishing the connection to the server
             player = new TcpClient();
             player.NoDelay = true;
             player.Connect("127.0.0.1", 8001);
 
             send = new StreamWriter(player.GetStream());
+            receive = new StreamReader(player.GetStream());
 
             // Sending username to server
             userName = "Paulina";
             send.WriteLine(userName);
             send.Flush();
 
-            // Getting messages from server 
-            messaging = new Thread(new ThreadStart(getMessage));
-            messaging.Start();
+            // On with side player has a paddle
+            serverMessage = receive.ReadLine();
 
-            // Sending messages to server
-            sending = new Thread(new ThreadStart(sendMessage));
-            sending.Start();
+            if (serverMessage == "Left")
+            {
+                paddle = paddleL;
+                paddleOp = paddleR;
+
+                // this.keysPlayer = new string[2] { "Up", "Down" };
+                // this.player1.setPlayersKeys(keysPlayer);
+            }
+            else if (serverMessage == "Right")
+            {
+                paddle = paddleR;
+                paddleOp = paddleL;
+
+                // this.keysPlayer = new string[2] { "W", "S" };
+                // this.player1.setPlayersKeys(keysPlayer);        
+            }
+
+            // Waiting for the opponent to connect 
+            waiting = new Thread(startGame);
+            waiting.Start();
 
         }
         //------------------------------------------------------------------------
-        private void getMessage()
+        public void startGame()
         {
-            receive = new StreamReader(player.GetStream());
-            string serverMessage = receive.ReadLine();
 
-            // Connection was successful
+            serverMessage = receive.ReadLine();
+
+            // The game can start
             if (serverMessage == "1")
             {
-                // Checking which player is on the left or right
-                serverMessage = receive.ReadLine();
-                
-                if (serverMessage == "Left")
-                {
-                    paddle = paddleL;
-                    paddleOp = paddleR;
-
-                   // this.keysPlayer = new string[2] { "up", "Down" };
-                   // this.player1.setPlayersKeys(keysPlayer);
-                }
-                else if (serverMessage == "Right")
-                {
-                    paddle = paddleR;
-                    paddleOp = paddleL;
-
-                   // this.keysPlayer = new string[2] { "W", "S" };
-                  //  this.player1.setPlayersKeys(keysPlayer);        
-                }
-
+                // Getting coordinates of opponent's paddle from server
                 moving = new Thread(moveOpponent);
                 moving.Start();
 
+                // Sending coordinates of player's paddle to server
+                sending = new Thread(new ThreadStart(sendMessage));
+                sending.Start();
+
+                gameOn = true;
             }
 
         }
@@ -108,8 +114,7 @@ namespace SharpPong
         private void sendMessage()
         {
             int seconds2 = DateTime.Now.Millisecond;
-            
-            // Sending messages to server
+
             while (true)
             {
                 // Send message after 30 milliseconds
@@ -117,13 +122,11 @@ namespace SharpPong
                
                 if (delay > 30)
                 {    
-                    // Sending the position of the player paddle
+                    // Sending the position of the player paddle to server
                     string message = paddle.Position.X.ToString() + " " + paddle.Position.Y.ToString();
                     send.WriteLine(message);
                     send.Flush();
                     seconds2 = DateTime.Now.Millisecond;
-
-                    Console.WriteLine(delay);
 
                 }
 

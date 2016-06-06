@@ -23,7 +23,7 @@ namespace SharpServer
 
         private Thread messagesPlayer1, messagesPlayer2;
 
-        private string dataPlayer1, dataPlayer2;
+        private string namePlayer1, namePlayer2;
 
         //-------------------------------------------------------------------
         public Connection()
@@ -39,38 +39,41 @@ namespace SharpServer
             connections.Start(); // Start listening at the specified port
 
             Console.WriteLine("Waiting for a connection...");
-
+            
+            // Player1 joined the game
             player1 = connections.AcceptTcpClient();
-            Console.WriteLine("Player1 joined the game.");
-
-            player2 = connections.AcceptTcpClient();
-            Console.WriteLine("Player2 joined the game.");
-
-
 
             receivePlayer1 = new StreamReader(player1.GetStream());
             sendPlayer1 = new StreamWriter(player1.GetStream());
 
+            namePlayer1 = receivePlayer1.ReadLine();
+            Console.WriteLine(namePlayer1 + " joined the game.");
+
+            sendPlayer1.WriteLine("Left");
+            sendPlayer1.Flush();
+
+            // Player2 joined the game
+            player2 = connections.AcceptTcpClient();
+
             receivePlayer2 = new StreamReader(player2.GetStream());
             sendPlayer2 = new StreamWriter(player2.GetStream());
 
-            dataPlayer1 = receivePlayer1.ReadLine();
-            dataPlayer2 = receivePlayer2.ReadLine();
+            namePlayer2 = receivePlayer2.ReadLine();
+            Console.WriteLine(namePlayer2 + " joined the game.");
 
-            if (dataPlayer1 != "" && dataPlayer2 != "")
-            {
-                // 1 means connected successfully
-                sendPlayer1.WriteLine("1");
-                sendPlayer1.Flush();
-                sendPlayer1.WriteLine("Left");
-                sendPlayer1.Flush();
-                sendPlayer2.WriteLine("1");
-                sendPlayer2.Flush();
-                sendPlayer2.WriteLine("Right");
-                sendPlayer2.Flush();
+            sendPlayer2.WriteLine("Right");
+            sendPlayer2.Flush();
 
-            }
+                     
+            // 1 means both players are connected and the game can start
+            sendPlayer1.WriteLine("1");
+            sendPlayer1.Flush();
 
+            sendPlayer2.WriteLine("1");
+            sendPlayer2.Flush();
+
+
+            Console.WriteLine("Listening...");
 
             messagesPlayer1 = new Thread(getMessages1);
             messagesPlayer1.Start();
@@ -82,8 +85,7 @@ namespace SharpServer
         //-------------------------------------------------------------------
         public void getMessages1()
         {
-
-            Console.WriteLine("Listening...");
+            string dataPlayer1;
 
             while (true)
             {
@@ -96,8 +98,7 @@ namespace SharpServer
         //-------------------------------------------------------------------
         public void getMessages2()
         {
-
-            Console.WriteLine("Listening...");
+            string dataPlayer2;
 
             while (true)
             {

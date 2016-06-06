@@ -22,7 +22,7 @@ namespace SharpPong
 
             // Paddle
             this.paddle = new RectangleShape(new Vector2f(120, 20));
-            Texture paddleTexture = new Texture("resources/textures/paddle2.png");
+            Texture paddleTexture = Settings.paddleT;
             paddle.Texture = paddleTexture;
             paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X, Settings.HEIGHT - paddle.Size.Y - 10);
         }
@@ -37,9 +37,9 @@ namespace SharpPong
                 paddle.Position += new Vector2f(paddleSpeed * deltaTime, 0f);
 
             // Moving the ball
-            loose = ball.movingArkanoid(deltaTime, paddle, tiles);
+            running = ball.movingArkanoid(deltaTime, paddle, tiles);
 
-            seconds = DateTime.Now.Second;
+            //seconds = DateTime.Now.Second;
         }
         //----------------------------------------------------------------------------------------------
         public override void displayRest(RenderWindow window)
@@ -50,7 +50,7 @@ namespace SharpPong
             // Display tiles
             for (int x = 0; x < tiles.xTab; x++)
                 for (int y = 0; y < tiles.yTab; y++)
-                    if (tiles.tileMap[x, y] == 49 || tiles.tileMap[x, y] == 50)
+                    if (tiles.tileMap[x, y] == '1' || tiles.tileMap[x, y] == '2')
                         window.Draw(tiles.tiles[x, y]);
 
         }

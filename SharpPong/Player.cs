@@ -31,10 +31,10 @@ namespace SharpPong
                 Keyboard.Key key = (Keyboard.Key)Enum.Parse(typeof(Keyboard.Key), keystr[i]);
                 this.keys.Add(key);
 
-                foreach (Keyboard.Key j in keys)
+               /* foreach (Keyboard.Key j in keys)
                 {
                     Console.WriteLine(j);
-                }
+                }*/
             }
             
         }

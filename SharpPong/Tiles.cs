@@ -11,7 +11,7 @@ namespace SharpPong
 {
     class Tiles
     {
-        public int[,] tileMap;
+        public char[,] tileMap;
         public int xTab, yTab;
         public RectangleShape[,] tiles;
         public int sizeX, sizeY; // tile size
@@ -22,10 +22,10 @@ namespace SharpPong
             this.sizeX = sizeX;
             this.sizeY = sizeY;
 
-            this.xTab = (int)Math.Floor((double)((Settings.WIDTH - 20) / sizeX));
-            this.yTab = (int)Math.Floor((double)((Settings.HEIGHT / 2) / sizeY));
+            this.xTab =(int)(Settings.WIDTH - 20) / sizeX;
+            this.yTab = (int)(Settings.HEIGHT / 2) / sizeY;
 
-            this.tileMap = new int[xTab, yTab];
+            this.tileMap = new char[xTab, yTab];
             this.tiles = new RectangleShape[xTab, yTab];
         }
 //-----------------------------------------------------------------------------------------------
@@ -44,20 +44,19 @@ namespace SharpPong
                 for (int x = 0; x < xTab; x++)
                 {
                     char ch = (char)reader.Read();
-                    int temp = Convert.ToInt32(ch);
-                    tileMap[x, y] = temp;
+                    tileMap[x, y] = ch;
 
                     RectangleShape tile = new RectangleShape(new Vector2f(sizeX - 5, sizeY - 5));
                     tile.Position = new Vector2f(posX, posY);
 
-                    if (temp == 49)
+                    if (ch == '1')
                     {
-                        tileTexture = new Texture("resources/textures/brick0.png");
+                        tileTexture = Settings.brick0T;
                         tile.Texture = tileTexture;
                     }
-                    else if (temp == 50)
+                    else if (ch == '2')
                     {
-                        tileTexture = new Texture("resources/textures/brick1.png");
+                        tileTexture = Settings.brick1T;
                         tile.Texture = tileTexture;
                     }
 

@@ -25,7 +25,7 @@ namespace SharpPong
             this.ballShape = new CircleShape(size);
             this.angle = Math.PI * 45 / 180;
 
-            Texture ballTexture = new Texture("resources/textures/ball.png");
+            Texture ballTexture = Settings.ballT;
             ballTexture.Smooth = true;
             this.ballShape.Texture = ballTexture;
 
@@ -122,7 +122,7 @@ namespace SharpPong
                 angle = 45 * (float)Math.PI / 180;
                 speed = 270;
 
-                return true;                
+                return false;                
             }
 
             
@@ -132,18 +132,18 @@ namespace SharpPong
 
             if (x >= 0 && x < tiles.xTab && y >= 0 && y < tiles.yTab && tiles.tileMap[x,y] == 49 )
             {
-                tiles.tileMap[x, y] = 0;
+                tiles.tileMap[x, y] = '0';
                 vertical *= -1;
                 //horizontal *= -1;
             }
             if (x >= 0 && y < tiles.yTab && y >= 0 && x < tiles.xTab && tiles.tileMap[x, y] == 50)
             {
-                tiles.tileMap[x, y] = 49;
+                tiles.tileMap[x, y] = '1';
                 vertical *= -1;
-                tiles.tiles[x, y].Texture = new Texture("resources/textures/brick2.png");
+                tiles.tiles[x, y].Texture = Settings.brick2T;
             }
 
-            return false;
+            return true;
         }
 //----------------------------------------------------------------------------------------------------------------------------------------------------
     }

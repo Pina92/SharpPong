@@ -18,7 +18,7 @@ namespace SharpPong
         public Pong()
         {
             // Left paddle
-            Texture paddleTexture = new Texture("resources/textures/paddle2.png");
+            Texture paddleTexture = Settings.paddleT;
             paddleTexture.Smooth = true;
             this.paddleL = new RectangleShape(new Vector2f(20, 120));
             paddleL.Texture = paddleTexture;
@@ -33,20 +33,23 @@ namespace SharpPong
             this.paddle = paddleL;
             this.keysPlayer = new string[2] { "Up", "Down" };
             this.player1.setPlayersKeys(keysPlayer);
+
         }
         //----------------------------------------------------------------------------------------------
         public override void move()
         {
+            int winner = 0;
 
             // Moving player's paddle
             movePlayer();
             
             // Moving opponent's paddle
-            //moveOpponent();
-
-            // Moving the ball
-            int winner = ball.movingPong(deltaTime, paddleL, paddleR);
+            moveOpponent();
             
+            // Moving the ball
+            if (running)
+                winner = ball.movingPong(deltaTime, paddleL, paddleR);
+
             // Gaining point by player or by opponent
             if (winner == -1)
                 player1.score += 1;

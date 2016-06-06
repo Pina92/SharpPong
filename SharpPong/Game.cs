@@ -11,31 +11,36 @@ namespace SharpPong
 {
     class Game
     {
-
+        public bool gameOn;
         int level;
         public Player player1, playerR;
-
+        public bool running;
+       
         // Ball and paddles
         public Ball ball;       
         public float paddleSpeed = 380f;
         
         // Time
         Clock clock, timer;
+        Time timeAdd;
         public float deltaTime;
+        bool pause;
 
         // Game over
-        public bool loose;
         Text counting;
         public int seconds;
 
         //----------------------------------
         public Game()
         {
-
+            this.gameOn = true;
             this.level = 1;
+            this.running = false;
 
             this.clock = new Clock();
             this.timer = new Clock();
+            this.timeAdd = Time.Zero;
+            this.pause = false;
 
             this.ball = new Ball(14, 300);
 
@@ -43,11 +48,10 @@ namespace SharpPong
             this.player1 = new Player("PlayerA", 0);
             this.playerR = new Player("PlayerB", 0);
 
-            this.loose = false;
             this.seconds = DateTime.Now.Second;
 
             // Counting
-            this.counting = new Text("", new Font("resources/robotastic.ttf"));
+            this.counting = new Text("", Settings.robotasticF);
             counting.Position = new Vector2f(Settings.WIDTH / 2 - 15, Settings.HEIGHT / 2 - 50);
             counting.CharacterSize = 50;
             counting.Color = new Color(255, 255, 255, 170);
@@ -83,32 +87,46 @@ namespace SharpPong
                 window.DispatchEvents();
 
                 //**********************************************************              
-                                  
-                if (!loose) // Move player paddle and ball
-                    move();
-                else // Time delaying when player loose  
+                if (gameOn)
                 {
-
-                    counting.DisplayedString = "3";
-
-                    if (DateTime.Now.Second - seconds == 1)
-                        counting.DisplayedString = "2";
-
-                    else if (DateTime.Now.Second - seconds == 2)
-                        counting.DisplayedString = "1";
-
-                    else if (DateTime.Now.Second - seconds >= 3 || DateTime.Now.Second - seconds < 0)
-                    {
-                        counting.DisplayedString = "0";
-                        loose = false;
+                    if (running)
+                    { // Move player paddle and ball
+                        move();
+                        pause = false;
+                        seconds = DateTime.Now.Second;
                     }
-   
-                }
+                    else
+                    { // Time delaying when player loose
+                        if (!pause)
+                        {
+                            timeAdd = timer.ElapsedTime + timeAdd;
+                            pause = true;
+                        }
 
+                        int countingNumber = 3 - Math.Abs(DateTime.Now.Second - seconds);
+                        counting.DisplayedString = countingNumber.ToString();
+                        
+                        if(countingNumber == 0 || countingNumber < 0)
+                        {
+                            counting.DisplayedString = "0";
+                            running = true;
+                            timer.Restart();
+                        }
+                    }
+                }
+                else
+                {
+                    if (!pause)
+                    {
+                        timeAdd = timer.ElapsedTime + timeAdd;
+                        pause = true;
+                    }
+                    seconds = DateTime.Now.Second;
+                }
                 //**********************************************************  
                 // Increase the level after 15 seconds 
 
-                if (getTime() % 15 == 0)
+                if (getTime() % 15 == 0 && running)
                     LevelUp();
    
                 //**********************************************************
@@ -116,9 +134,11 @@ namespace SharpPong
 
                 // Background
                 window.Draw(background);
-                
-                // Time                                                            
-                time.DisplayedString = getTime().ToString();
+
+                // Time    
+                if (running)
+                   time.DisplayedString = getTime().ToString();
+
                 window.Draw(time);
 
                 // Ball
@@ -133,7 +153,7 @@ namespace SharpPong
                 displayRest(window);
 
                 // Counting 
-                if (loose)
+                if (!running)
                     window.Draw(counting);
 
                 //**********************************************************
@@ -149,7 +169,7 @@ namespace SharpPong
         public double getTime()
         {
 
-            Time temp = timer.ElapsedTime;
+            Time temp = timer.ElapsedTime + timeAdd;
             double time = Math.Round(temp.AsSeconds(), 2);
              
             return time;
@@ -159,7 +179,7 @@ namespace SharpPong
         // Returning ball
         public CircleShape getBall()
         {
-
+            
             return ball.ballShape;
 
         }
