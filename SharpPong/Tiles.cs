@@ -22,7 +22,7 @@ namespace SharpPong
             this.sizeX = sizeX;
             this.sizeY = sizeY;
 
-            this.xTab =(int)(Settings.WIDTH - 20) / sizeX;
+            this.xTab = (int)(Settings.WIDTH - 20) / sizeX;
             this.yTab = (int)(Settings.HEIGHT / 2) / sizeY;
 
             this.tileMap = new char[xTab, yTab];

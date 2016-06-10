@@ -84,8 +84,8 @@ namespace SharpPong
             if (serverMessage == "1")
             {
                 // Getting coordinates of opponent's paddle from server
-                moving = new Thread(moveOpponent);
-                moving.Start();
+                //moving = new Thread(moveOpponent);
+                //moving.Start();
 
                 // Sending coordinates of player's paddle to server
                 sending = new Thread(new ThreadStart(sendMessage));
@@ -99,36 +99,46 @@ namespace SharpPong
         public override void moveOpponent()
         {
 
-            while (true)
+            // Receiving and updating the position of the opponent paddle
+            try
             {
-                // Receiving and updating the position of the opponent paddle
                 string[] coordinations = receive.ReadLine().Split(' ');
                 float coordinationX = Convert.ToSingle(coordinations[0]);
                 float coordinationY = Convert.ToSingle(coordinations[1]);
 
                 paddleOp.Position = new Vector2f(paddleOp.Position.X, coordinationY);
+            }
+            catch
+            {
 
             }
+
         }
         //------------------------------------------------------------------------
         private void sendMessage()
         {
             int seconds2 = DateTime.Now.Millisecond;
-
-            while (true)
+            try
             {
-                // Send message after 30 milliseconds
-                int delay = Math.Abs(DateTime.Now.Millisecond - seconds2);
-               
-                if (delay > 30)
-                {    
-                    // Sending the position of the player paddle to server
-                    string message = paddle.Position.X.ToString() + " " + paddle.Position.Y.ToString();
-                    send.WriteLine(message);
-                    send.Flush();
-                    seconds2 = DateTime.Now.Millisecond;
+                while (true)
+                {
+                    // Send message after 30 milliseconds
+                    int delay = Math.Abs(DateTime.Now.Millisecond - seconds2);
+
+                    if (delay > 30)
+                    {
+                        // Sending the position of the player paddle to server
+                        string message = paddle.Position.X.ToString() + " " + paddle.Position.Y.ToString();
+                        send.WriteLine(message);
+                        send.Flush();
+                        seconds2 = DateTime.Now.Millisecond;
+
+                    }
 
                 }
+            }
+            catch
+            {
 
             }
 

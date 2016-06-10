@@ -19,7 +19,6 @@ namespace SharpServer
         {
 
             Connection newConnection = new Connection();
-            newConnection.StartListening();
 
         }
     }
