@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using SFML.System;
 using SFML.Window;
+using SFML.Graphics;
 
 namespace SharpPong
 {
     class PongHotSeat : Pong
     {
+        public PongHotSeat(RenderWindow rw) : base(rw) { }
 
         public override void moveOpponent()
         {

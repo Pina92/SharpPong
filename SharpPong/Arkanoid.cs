@@ -14,7 +14,7 @@ namespace SharpPong
         Tiles tiles;
         private RectangleShape paddle;
         //----------------------------------------------------------------------------------------------
-        public Arkanoid()
+        public Arkanoid(RenderWindow rw) : base(rw)
         {
             // Reading tiles
             this.tiles = new Tiles(97, 35);
@@ -22,7 +22,7 @@ namespace SharpPong
 
             // Paddle
             this.paddle = new RectangleShape(new Vector2f(120, 20));
-            Texture paddleTexture = Settings.paddleT;
+            Texture paddleTexture = ResourceManager.getTexture("resources/textures/paddle2.png");
             paddle.Texture = paddleTexture;
             paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X, Settings.HEIGHT - paddle.Size.Y - 10);
         }
@@ -42,7 +42,7 @@ namespace SharpPong
             //seconds = DateTime.Now.Second;
         }
         //----------------------------------------------------------------------------------------------
-        public override void displayRest(RenderWindow window)
+        public override void postRender()
         {
             // Display paddle
             window.Draw(paddle);

@@ -15,10 +15,10 @@ namespace SharpPong
         public RectangleShape paddle, paddleOp, paddleL, paddleR;
         public string[] keysPlayer;
         //----------------------------------------------------------------------------------------------
-        public Pong()
+        public Pong(RenderWindow rw) : base(rw)
         {
             // Left paddle
-            Texture paddleTexture = Settings.paddleT;
+            Texture paddleTexture = ResourceManager.getTexture("resources/textures/paddle2.png");
             paddleTexture.Smooth = true;
             this.paddleL = new RectangleShape(new Vector2f(20, 120));
             paddleL.Texture = paddleTexture;
@@ -55,7 +55,12 @@ namespace SharpPong
                 player1.score += 1;
             else if (winner == 1)
                 playerR.score += 1;
-              
+
+            if (winner != 0)
+            {
+                ball.speed = 300;
+                running = false;
+            }            
             // TODO: Loosing game
 
         }
@@ -90,7 +95,7 @@ namespace SharpPong
 
         }
         //----------------------------------------------------------------------------------------------
-        public override void displayRest(RenderWindow window)
+        public override void postRender()
         {
             // Display paddles
             window.Draw(paddleL);

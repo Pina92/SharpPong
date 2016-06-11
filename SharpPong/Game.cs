@@ -11,6 +11,7 @@ namespace SharpPong
 {
     class Game
     {
+        public RenderWindow window;
         public bool gameOn;
         int level;
         public Player player1, playerR;
@@ -21,8 +22,9 @@ namespace SharpPong
         public float paddleSpeed = 380f;
         
         // Time
-        Clock clock, timer;
-        Time timeAdd;
+        protected Clock timer;
+        private Clock clock;
+        private Time timeAdd;
         public float deltaTime;
         bool pause;
 
@@ -31,8 +33,10 @@ namespace SharpPong
         public int seconds;
 
         //----------------------------------
-        public Game()
+        public Game(RenderWindow rw)
         {
+
+            this.window = rw;
             this.gameOn = true;
             this.level = 1;
             this.running = false;
@@ -51,7 +55,7 @@ namespace SharpPong
             this.seconds = DateTime.Now.Second;
 
             // Counting
-            this.counting = new Text("", Settings.robotasticF);
+            this.counting = new Text("", ResourceManager.GetFont("resources/robotastic.ttf"));
             counting.Position = new Vector2f(Settings.WIDTH / 2 - 15, Settings.HEIGHT / 2 - 50);
             counting.CharacterSize = 50;
             counting.Color = new Color(255, 255, 255, 170);
@@ -71,12 +75,12 @@ namespace SharpPong
         public virtual void move() { }
 
         // Displaying paddles, objects for specific game, etc. 
-        public virtual void displayRest(RenderWindow window) { }
+        public virtual void postRender() { }
         //----------------------------------
         // Running game
-        public void run(RenderWindow window, Text time, Text score, RectangleShape background, int type)
+        public void run(Text time, Text score, RectangleShape background)
         {
-            
+                      
             // Game loop
             while (window.IsOpen)
             {
@@ -128,39 +132,10 @@ namespace SharpPong
 
                 if (getTime() % 15 == 0 && running)
                     LevelUp();
-   
+
                 //**********************************************************
                 // Display everything on screen
-
-                // Background
-                window.Draw(background);
-
-                // Time    
-                if (running)
-                   time.DisplayedString = getTime().ToString();
-
-                window.Draw(time);
-
-                // Ball
-                CircleShape ballObject = getBall();
-                window.Draw(ballObject);
-
-                // Player's score
-                score.DisplayedString = player1.score.ToString() + " : " + playerR.score.ToString();
-                window.Draw(score);
-
-                // Paddles, objects for specific game, etc. 
-                displayRest(window);
-
-                // Counting 
-                if (!running)
-                    window.Draw(counting);
-
-                //**********************************************************
-
-                // Update the window
-                window.Display();
-
+                renderGame(time, score, background);
             }
 
         }
@@ -176,11 +151,33 @@ namespace SharpPong
 
         }
         //----------------------------------
-        // Returning ball
-        public CircleShape getBall()
+        private void renderGame(Text time, Text score, RectangleShape background)
         {
-            
-            return ball.ballShape;
+            // Background
+            window.Draw(background);
+
+            // Time    
+            if (running)
+                time.DisplayedString = getTime().ToString();
+
+            window.Draw(time);
+
+            // Ball
+            window.Draw(ball.ballShape);
+
+            // Player's score
+            score.DisplayedString = player1.score.ToString() + " : " + playerR.score.ToString();
+            window.Draw(score);
+
+            // Paddles, objects for specific game, etc. 
+            postRender();
+
+            // Counting 
+            if (!running)
+                window.Draw(counting);
+
+            // Update the window
+            window.Display();
 
         }
         //----------------------------------

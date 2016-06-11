@@ -35,19 +35,20 @@ namespace SharpPong
             Color windowColor = new Color(0, 192, 255);
 
             // Text
-            Text time = new Text("0.0", Settings.robotasticF);
+            Font robotasticF = ResourceManager.GetFont("resources/robotastic.ttf");
+            Text time = new Text("0.0", robotasticF);
 
             time.Position = new Vector2f(Settings.WIDTH - 90, 10);
             time.CharacterSize = 18;
             time.Color = new Color(255, 255, 255, 170);
 
-            Text score = new Text("0:0", Settings.robotasticF);
+            Text score = new Text("0:0", robotasticF);
             score.Position = new Vector2f(Settings.WIDTH / 2 - 30, 10);
             score.CharacterSize = 22;
             score.Color = new Color(255, 255, 255, 170);
 
             // Background
-            Texture backgroundTexture = Settings.backgroundT;
+            Texture backgroundTexture = ResourceManager.getTexture("resources/textures/background.png");
             RectangleShape background = new RectangleShape(new Vector2f(Settings.WIDTH, Settings.HEIGHT));
             backgroundTexture.Repeated = true;
             background.Texture = backgroundTexture;
@@ -58,22 +59,22 @@ namespace SharpPong
 
             // Creating new game
             if (option == "Pong") {
-                Pong pong = new Pong();
-                pong.run(window, time, score, background, 2);
+                Pong pong = new Pong(window);
+                pong.run(time, score, background);
             }
             else if (option == "Hot-Seat")
             {
-                PongHotSeat pongHotSeat = new PongHotSeat();
-                pongHotSeat.run(window, time, score, background, 2);
+                PongHotSeat pongHotSeat = new PongHotSeat(window);
+                pongHotSeat.run(time, score, background);
             }
             else if (option == "Arkanoid") {
-                Arkanoid arkanoid = new Arkanoid();
-                arkanoid.run(window, time, score, background, 2);
+                Arkanoid arkanoid = new Arkanoid(window);
+                arkanoid.run(time, score, background);
             }
             else if (option == "Multiplayer")
             {
-                Multiplayer multiplayer = new Multiplayer();
-                multiplayer.run(window, time, score, background, 2);
+                Multiplayer multiplayer = new Multiplayer(window);
+                multiplayer.run(time, score, background);
             }
             else if (option == "Exit")
                 window.Close();
@@ -89,7 +90,7 @@ namespace SharpPong
 
             for (int j = 0; j < 5; j++)
             {
-                Text position = new Text("0.0", Settings.robotasticF);
+                Text position = new Text("0.0", ResourceManager.GetFont("resources/robotastic.ttf"));
                 position.DisplayedString = list[j];
                 position.Position = new Vector2f(Settings.WIDTH / 2 - 25, 50 + j * 120);
                 position.CharacterSize = 25;

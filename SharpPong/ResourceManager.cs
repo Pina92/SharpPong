@@ -10,20 +10,14 @@ using SFML.Graphics;
 
 namespace SharpPong
 {
-    class ResourceManager
+    static class ResourceManager
     {
 
-        protected static Hashtable fonts;
-        protected static Hashtable textures;
-        //....
-
-        public ResourceManager()
-        {
-            fonts = new Hashtable();
-            textures = new Hashtable();
-        }
+        static Hashtable fonts = new Hashtable();
+        static Hashtable textures = new Hashtable();
+        
         //-------------------------------------------------
-        public Font GetFont(string font_path)
+        static public Font GetFont(string font_path)
         {
 
             if (fonts.ContainsKey(font_path))
@@ -38,7 +32,7 @@ namespace SharpPong
 
         }
         //-------------------------------------------------
-        public Texture getTexture(string texture_path)
+        static public Texture getTexture(string texture_path)
         {
 
             if (textures.ContainsKey(texture_path))

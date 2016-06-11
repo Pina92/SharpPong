@@ -17,7 +17,7 @@ namespace SharpPong
         public float horizontal = 1, vertical = 1;
         double angle;
         Random ran = new Random();
-        //----------------------------------------------------------------------------------------------------------------------------------------------------       
+        //------------------------------------------------------------------------------------------------------------------
         public Ball(float size, float speed)
         {
             this.size = size;
@@ -25,42 +25,58 @@ namespace SharpPong
             this.ballShape = new CircleShape(size);
             this.angle = Math.PI * 45 / 180;
 
-            Texture ballTexture = Settings.ballT;
+            Texture ballTexture = ResourceManager.getTexture("resources/textures/ball.png");
             ballTexture.Smooth = true;
             this.ballShape.Texture = ballTexture;
 
             this.ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
         }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------
         // Moving a ball + returning '1' if player on the right side wins or '-1' if player on the left side wins ('0' if nobody wins) 
         public int movingPong(float deltaTime, RectangleShape paddleL, RectangleShape paddleR)
         {
             ballShape.Position += new Vector2f(speed * deltaTime * horizontal, speed * deltaTime * vertical);
 
-            if (ballShape.Position.Y < 10f || ballShape.Position.Y > Settings.HEIGHT - 10 - size)
+            // Checking collison between the ball and walls  
+            if (ballShape.Position.Y <= 0f) // Top wall
+            {
                 vertical *= -1;
-
-            // Checking collison between ball and left paddle (player)
-            if (ballShape.Position.X < paddleL.Position.X + paddleL.Size.X  &&
-                ballShape.Position.Y > paddleL.Position.Y &&
-                ballShape.Position.Y < paddleL.Position.Y + paddleL.Size.Y)
+                ballShape.Position = new Vector2f(ballShape.Position.X, 0f);
+            }
+            if(ballShape.Position.Y + size >= Settings.HEIGHT)// Bottom wall
+            {
+                vertical *= -1;
+                ballShape.Position = new Vector2f(ballShape.Position.X, Settings.HEIGHT - size);
+            }
+            // Checking collison between ball and left paddle
+            if (ballShape.Position.X <= paddleL.Position.X + paddleL.Size.X  &&
+                ballShape.Position.X >= paddleL.Position.X &&
+                ballShape.Position.Y >= paddleL.Position.Y &&
+                ballShape.Position.Y <= paddleL.Position.Y + paddleL.Size.Y)
             {
                 horizontal *= -1;
+                ballShape.Position = new Vector2f(paddleL.Position.X + paddleL.Size.X, ballShape.Position.Y);
             }
-            if (ballShape.Position.X < 0f)
+            
+            // Game Over (Left Player)
+            if (ballShape.Position.X + size <= 0f)
             {
                 ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
                 return 1;
             }
 
-            // Checking collison between ball and right paddle (computer)
-            if (ballShape.Position.X + size > paddleR.Position.X &&
-                ballShape.Position.Y > paddleR.Position.Y &&
-                ballShape.Position.Y < paddleR.Position.Y + paddleR.Size.Y)
+            // Checking collison between ball and right paddle 
+            if (ballShape.Position.X + size >= paddleR.Position.X &&
+                ballShape.Position.X + size <= paddleR.Position.X + paddleR.Size.X &&
+                ballShape.Position.Y >= paddleR.Position.Y &&
+                ballShape.Position.Y <= paddleR.Position.Y + paddleR.Size.Y)
             {
                 horizontal *= -1;
+                ballShape.Position = new Vector2f(paddleR.Position.X - size, ballShape.Position.Y);
             }
-            if (ballShape.Position.X > Settings.WIDTH)
+
+            // Game Over (Right Player)
+            if (ballShape.Position.X + size >= Settings.WIDTH)
             {
                 ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
                 return -1;
@@ -68,7 +84,7 @@ namespace SharpPong
 
             return 0;
         }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------
         // Return true if player don't hit the ball and loose 
         public bool movingArkanoid(float deltaTime, RectangleShape paddle, Tiles tiles)
         {            
@@ -90,7 +106,8 @@ namespace SharpPong
                 horizontal *= -1;
                 ballShape.Position = new Vector2f(Settings.WIDTH - ballShape.Radius, ballShape.Position.Y);
             }
-            if (ballShape.Position.Y <= 0f) { // Top wall 
+            if (ballShape.Position.Y <= 0f) // Top wall 
+            { 
                 vertical *= -1;
                 ballShape.Position = new Vector2f(ballShape.Position.X, 0f);
             }
@@ -140,11 +157,11 @@ namespace SharpPong
             {
                 tiles.tileMap[x, y] = '1';
                 vertical *= -1;
-                tiles.tiles[x, y].Texture = Settings.brick2T;
+                tiles.tiles[x, y].Texture = ResourceManager.getTexture("resources/textures/brick2.png");
             }
 
             return true;
         }
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------
     }
 }

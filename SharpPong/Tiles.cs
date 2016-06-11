@@ -50,14 +50,12 @@ namespace SharpPong
                     tile.Position = new Vector2f(posX, posY);
 
                     if (ch == '1')
-                    {
-                        tileTexture = Settings.brick0T;
-                        tile.Texture = tileTexture;
+                    {                       
+                        tile.Texture = ResourceManager.getTexture("resources/textures/brick0.png");
                     }
                     else if (ch == '2')
                     {
-                        tileTexture = Settings.brick1T;
-                        tile.Texture = tileTexture;
+                        tile.Texture = ResourceManager.getTexture("resources/textures/brick1.png");
                     }
 
                     tiles[x, y] = tile;

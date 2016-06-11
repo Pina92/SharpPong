@@ -55,8 +55,11 @@ namespace SharpServer
                 {
 
                     dataPlayer1 = receivePlayer1.ReadLine();
-                    sendPlayer2.WriteLine(dataPlayer1);
-                    sendPlayer2.Flush();
+                    if (player2.Connected == true)
+                    {
+                        sendPlayer2.WriteLine(dataPlayer1);
+                        sendPlayer2.Flush();
+                    }
                 }
             }
             catch
@@ -65,11 +68,16 @@ namespace SharpServer
                 receivePlayer1.Close();
                 sendPlayer1.Close();
                 player1.Close();
-
                 Console.WriteLine("Player1 has disconnected.");
-                connected = false;
-                waitingForPlayers();
 
+                if (player2.Connected == true)
+                {
+                    sendPlayer2.WriteLine("Stop");
+                    sendPlayer2.Flush();
+
+                    connected = false;
+                    waitingForPlayers();
+                }
             }
 
         }
@@ -82,8 +90,11 @@ namespace SharpServer
                 while (connected)
                 {
                     dataPlayer2 = receivePlayer2.ReadLine();
-                    sendPlayer1.WriteLine(dataPlayer2);
-                    sendPlayer1.Flush();
+                    if (player1.Connected == true)
+                    {
+                        sendPlayer1.WriteLine(dataPlayer2);
+                        sendPlayer1.Flush();
+                    }
                 }
             }
             catch
@@ -92,10 +103,16 @@ namespace SharpServer
                 receivePlayer2.Close();
                 sendPlayer2.Close();
                 player2.Close();
-
                 Console.WriteLine("Player2 has disconnected.");
-                connected = false;
-                waitingForPlayers();
+
+                if (player1.Connected == true)
+                {
+                    sendPlayer1.WriteLine("Stop");
+                    sendPlayer1.Flush();
+
+                    connected = false;
+                    waitingForPlayers();
+                }
 
             }
 
@@ -137,11 +154,11 @@ namespace SharpServer
                }
                else if (player1.Connected == true && player2.Connected == true)
                {
-                    // 1 means both players are connected and the game can start
-                    sendPlayer1.WriteLine("1");
+                    // Both players are connected and the game can start
+                    sendPlayer1.WriteLine("Start");
                     sendPlayer1.Flush();
 
-                    sendPlayer2.WriteLine("1");
+                    sendPlayer2.WriteLine("Start");
                     sendPlayer2.Flush();
 
                     Console.WriteLine("Listening...");
