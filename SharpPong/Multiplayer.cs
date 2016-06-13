@@ -124,7 +124,7 @@ namespace SharpPong
                     Console.WriteLine("Your opponent left the game. You are the winner :)");
                     gameOn = false;
                     running = false;
-                    player1.score = 0;
+                    playerL.score = 0;
                     playerR.score = 0;
                     timer.Restart();
 

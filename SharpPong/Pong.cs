@@ -32,7 +32,7 @@ namespace SharpPong
             // Player
             this.paddle = paddleL;
             this.keysPlayer = new string[2] { "Up", "Down" };
-            this.player1.setPlayersKeys(keysPlayer);
+            this.playerL.setPlayersKeys(keysPlayer);
 
         }
         //----------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ namespace SharpPong
 
             // Gaining point by player or by opponent
             if (winner == -1)
-                player1.score += 1;
+                playerL.score += 1;
             else if (winner == 1)
                 playerR.score += 1;
 
@@ -60,7 +60,7 @@ namespace SharpPong
             {
                 ball.speed = 300;
                 running = false;
-            }            
+            }
             // TODO: Loosing game
 
         }
@@ -68,11 +68,11 @@ namespace SharpPong
         public void movePlayer()
         {
             // Moving player's paddle
-            if (Keyboard.IsKeyPressed((Keyboard.Key)player1.keys[0]) && paddle.Position.Y > 5f)
+            if (Keyboard.IsKeyPressed((Keyboard.Key)playerL.keys[0]) && paddle.Position.Y > 5f)
             {
                 paddle.Position += new Vector2f(0f, -paddleSpeed * deltaTime);
             }
-            if (Keyboard.IsKeyPressed((Keyboard.Key)player1.keys[1]) && paddle.Position.Y < Settings.HEIGHT - (paddle.Size.Y + 5))
+            if (Keyboard.IsKeyPressed((Keyboard.Key)playerL.keys[1]) && paddle.Position.Y < Settings.HEIGHT - (paddle.Size.Y + 5))
             {
                 paddle.Position += new Vector2f(0f, paddleSpeed * deltaTime);
             }
@@ -83,7 +83,7 @@ namespace SharpPong
     
             Random rnd = new Random();
 
-            // Delay computer's paddle (after 3 seconds) 
+            // Delay computer's paddle (after 2 seconds) 
             if (getTime() % 2 == 0)
                 delay = rnd.Next(270);
 

@@ -11,54 +11,75 @@ namespace SharpPong
 {
     class Game
     {
+        // Game
         public RenderWindow window;
         public bool gameOn;
-        int level;
-        public Player player1, playerR;
         public bool running;
-       
-        // Ball and paddles
-        public Ball ball;       
-        public float paddleSpeed = 380f;
-        
-        // Time
-        protected Clock timer;
-        private Clock clock;
-        private Time timeAdd;
-        public float deltaTime;
-        bool pause;
+        private int level;
 
-        // Game over
-        Text counting;
+        // Time
+        private Clock clock;
+        protected Clock timer;
+        private Time timeAdd;
+        private bool pause;
         public int seconds;
+        public float deltaTime;
+
+        // Players and ball
+        public Player playerL, playerR;
+        public float paddleSpeed = 550f;
+        public Ball ball;       
+
+        // Objects to display
+        Text counting, time, score;
+        RectangleShape background;
 
         //----------------------------------
         public Game(RenderWindow rw)
         {
-
+            // Game
             this.window = rw;
             this.gameOn = true;
-            this.level = 1;
             this.running = false;
+            this.level = 1;
 
+            // Time
             this.clock = new Clock();
             this.timer = new Clock();
             this.timeAdd = Time.Zero;
             this.pause = false;
-
-            this.ball = new Ball(14, 300);
-
-            // Setting players
-            this.player1 = new Player("PlayerA", 0);
-            this.playerR = new Player("PlayerB", 0);
-
             this.seconds = DateTime.Now.Second;
 
-            // Counting
-            this.counting = new Text("", ResourceManager.GetFont("resources/robotastic.ttf"));
+            // Setting players and ball
+            this.playerL = new Player("PlayerA", 0);
+            this.playerR = new Player("PlayerB", 0);
+            this.ball = new Ball(14, 300);
+
+
+            Font robotasticF = ResourceManager.GetFont("resources/robotastic.ttf");
+            // Text - Counting
+            this.counting = new Text("", robotasticF);
             counting.Position = new Vector2f(Settings.WIDTH / 2 - 15, Settings.HEIGHT / 2 - 50);
             counting.CharacterSize = 50;
             counting.Color = new Color(255, 255, 255, 170);
+
+            // Text - Time
+            this.time = new Text("0.0", robotasticF);
+            time.Position = new Vector2f(Settings.WIDTH - 90, 10);
+            time.CharacterSize = 18;
+            time.Color = new Color(255, 255, 255, 170);
+
+             // Text - Score
+            score = new Text("0:0", robotasticF);
+            score.Position = new Vector2f(Settings.WIDTH / 2 - 30, 10);
+            score.CharacterSize = 22;
+            score.Color = new Color(255, 255, 255, 170);
+
+            // Background
+            this.background = new RectangleShape(new Vector2f(Settings.WIDTH, Settings.HEIGHT));
+            background.Texture = ResourceManager.getTexture("resources/textures/background.png");
+            background.Texture.Repeated = true;
+            background.TextureRect = new IntRect(0, 0, (int)Settings.WIDTH, (int)Settings.HEIGHT);
 
         }
         //----------------------------------
@@ -78,7 +99,7 @@ namespace SharpPong
         public virtual void postRender() { }
         //----------------------------------
         // Running game
-        public void run(Text time, Text score, RectangleShape background)
+        public void run()
         {
                       
             // Game loop
@@ -86,6 +107,13 @@ namespace SharpPong
             {
                 
                 deltaTime = clock.Restart().AsSeconds();
+
+               // Back to the menu if Escape was pressed 
+               // TO-DO: Esc -> Resume, Menu, Exit
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                {
+                    Menu menu = new Menu(window);
+                }
 
                 // Process events
                 window.DispatchEvents();
@@ -135,7 +163,7 @@ namespace SharpPong
 
                 //**********************************************************
                 // Display everything on screen
-                renderGame(time, score, background);
+                renderGame();
             }
 
         }
@@ -151,7 +179,7 @@ namespace SharpPong
 
         }
         //----------------------------------
-        private void renderGame(Text time, Text score, RectangleShape background)
+        private void renderGame()
         {
             // Background
             window.Draw(background);
@@ -166,7 +194,7 @@ namespace SharpPong
             window.Draw(ball.ballShape);
 
             // Player's score
-            score.DisplayedString = player1.score.ToString() + " : " + playerR.score.ToString();
+            score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
             window.Draw(score);
 
             // Paddles, objects for specific game, etc. 

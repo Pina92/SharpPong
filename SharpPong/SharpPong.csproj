@@ -73,6 +73,7 @@
     <Compile Include="Arkanoid.cs" />
     <Compile Include="Ball.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Menu.cs" />
     <Compile Include="Multiplayer.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Pong.cs" />
@@ -99,43 +100,43 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-	<Content Include="resources\*">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</Content>
-	<Content Include="resources\textures\*">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</Content>
+    <Content Include="resources\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\textures\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <ContentWithTargetPath Include="lib\csfml-audio-2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>csfml-audio-2.dll</TargetPath>
+      <TargetPath>csfml-audio-2.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\csfml-graphics-2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>csfml-graphics-2.dll</TargetPath>
+      <TargetPath>csfml-graphics-2.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\csfml-system-2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>csfml-system-2.dll</TargetPath>
+      <TargetPath>csfml-system-2.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\csfml-window-2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>csfml-window-2.dll</TargetPath>
+      <TargetPath>csfml-window-2.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\libsndfile-1.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>libsndfile-1.dll</TargetPath>
+      <TargetPath>libsndfile-1.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\openal32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>openal32.dll</TargetPath>
+      <TargetPath>openal32.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\OpenTK.Compatibility.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>OpenTK.Compatibility.dll</TargetPath>
+      <TargetPath>OpenTK.Compatibility.dll</TargetPath>
     </ContentWithTargetPath>
     <ContentWithTargetPath Include="lib\OpenTK.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>OpenTK.dll</TargetPath>
+      <TargetPath>OpenTK.dll</TargetPath>
     </ContentWithTargetPath>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

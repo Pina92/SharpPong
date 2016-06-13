@@ -15,7 +15,6 @@ namespace SharpPong
         public int xTab, yTab;
         public RectangleShape[,] tiles;
         public int sizeX, sizeY; // tile size
-        Texture tileTexture; 
 
         public Tiles(int sizeX, int sizeY)
         {
