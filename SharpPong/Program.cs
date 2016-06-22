@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
 
@@ -16,15 +14,17 @@ namespace SharpPong
         //----------------------------------------       
         static void OnClose(object sender, EventArgs e)
         {
+            
             // Close the window when OnClose event is received
             RenderWindow window = (RenderWindow)sender;
             window.Close();
+
         }
         //----------------------------------------
         static void Main(string[] args)
         {
             
-            // Window
+            // Creating window
             ContextSettings settings = new ContextSettings();
             settings.AntialiasingLevel = 8;
 

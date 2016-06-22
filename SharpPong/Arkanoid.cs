@@ -22,9 +22,10 @@ namespace SharpPong
 
             // Paddle
             this.paddle = new RectangleShape(new Vector2f(120, 20));
-            Texture paddleTexture = ResourceManager.getTexture("resources/textures/paddle2.png");
+            Texture paddleTexture = ResourceManager.GetTexture("resources/textures/paddle2.png");
             paddle.Texture = paddleTexture;
             paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X, Settings.HEIGHT - paddle.Size.Y - 10);
+
         }
         //----------------------------------------------------------------------------------------------
         public override void move()
@@ -39,7 +40,6 @@ namespace SharpPong
             // Moving the ball
             running = ball.movingArkanoid(deltaTime, paddle, tiles);
 
-            //seconds = DateTime.Now.Second;
         }
         //----------------------------------------------------------------------------------------------
         public override void postRender()

@@ -33,6 +33,7 @@ namespace SharpPong
         private Thread sending, waiting;
         string serverMessage;
 
+        private float ballX, ballY;
         //------------------------------------------------------------------------
         public void startConnection()
         {
@@ -111,6 +112,20 @@ namespace SharpPong
 
         }
         //------------------------------------------------------------------------
+        public override void move()
+        {         
+
+            // Moving player's paddle
+            movePlayer();
+
+            // Moving opponent's paddle
+            moveOpponent();
+
+            // Moving the ball
+            ball.MovingMultiplayer(deltaTime, ballX, ballY);
+
+        }
+        //------------------------------------------------------------------------
         // Receiving and updating the position of the opponent paddle
         public override void moveOpponent()
         {
@@ -133,9 +148,14 @@ namespace SharpPong
                 }
                 else
                 {
-                    // Getting coordinates of opponent's paddle from server  
-                    float coordinationY = Convert.ToSingle(serverMessage);
-                    paddleOp.Position = new Vector2f(paddleOp.Position.X, coordinationY);
+                    // Getting coordinates of opponent's paddle and ball from server (paddleY|ballX|ballY).
+                    string[] coordinations = serverMessage.Split('|'); 
+
+                    float paddleOpY = Convert.ToSingle(coordinations[0]);
+                    paddleOp.Position = new Vector2f(paddleOp.Position.X, paddleOpY);
+
+                    ballX = Convert.ToSingle(coordinations[1]);
+                    ballY = Convert.ToSingle(coordinations[2]);
 
                 }
             }
@@ -154,14 +174,13 @@ namespace SharpPong
             {
                 while (gameOn)
                 {
-                    // Send message after 30 milliseconds
+                    // Send message after 30 milliseconds.
                     int delay = Math.Abs(DateTime.Now.Millisecond - seconds2);
 
                     if (delay > 30)
                     {
-                        // Sending the position of the player paddle to server
-                        string message = paddle.Position.Y.ToString();
-                        send.WriteLine(message);
+                        // Sending the position of the player paddle to server.
+                        send.WriteLine(paddle.Position.X.ToString() + '|' + paddle.Position.Y.ToString());
                         send.Flush();
                         seconds2 = DateTime.Now.Millisecond;
 
@@ -176,7 +195,20 @@ namespace SharpPong
 
         }
         //------------------------------------------------------------------------
+        protected override void EscMenu()
+        {
+            Console.WriteLine("Sending stop2");
+            try
+            {
+                receive.Close();
+                send.Close();
+                player.Close();
+            }
+            catch { }
 
-
+            Menu menu = new Menu(window);
+            
+        }
+        //------------------------------------------------------------------------
     }
 }

@@ -50,11 +50,11 @@ namespace SharpPong
 
                     if (ch == '1')
                     {                       
-                        tile.Texture = ResourceManager.getTexture("resources/textures/brick0.png");
+                        tile.Texture = ResourceManager.GetTexture("resources/textures/brick0.png");
                     }
                     else if (ch == '2')
                     {
-                        tile.Texture = ResourceManager.getTexture("resources/textures/brick1.png");
+                        tile.Texture = ResourceManager.GetTexture("resources/textures/brick1.png");
                     }
 
                     tiles[x, y] = tile;

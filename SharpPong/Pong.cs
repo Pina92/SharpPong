@@ -11,14 +11,18 @@ namespace SharpPong
 {
     class Pong : Game
     {
-        float delay = 0;
+        private int level;
+        private float delay = 0;
         public RectangleShape paddle, paddleOp, paddleL, paddleR;
         public string[] keysPlayer;
         //----------------------------------------------------------------------------------------------
         public Pong(RenderWindow rw) : base(rw)
         {
+
+            this.level = 1;
+
             // Left paddle
-            Texture paddleTexture = ResourceManager.getTexture("resources/textures/paddle2.png");
+            Texture paddleTexture = ResourceManager.GetTexture("resources/textures/paddle2.png");
             paddleTexture.Smooth = true;
             this.paddleL = new RectangleShape(new Vector2f(20, 120));
             paddleL.Texture = paddleTexture;
@@ -36,9 +40,18 @@ namespace SharpPong
 
         }
         //----------------------------------------------------------------------------------------------
+        // Increase game level
+        public void LevelUp()
+        {
+
+            level++;
+            ball.speed += 5;
+
+        } 
+        //----------------------------------------------------------------------------------------------
         public override void move()
         {
-            int winner = 0;
+            int winner = 0;           
 
             // Moving player's paddle
             movePlayer();
@@ -58,10 +71,19 @@ namespace SharpPong
 
             if (winner != 0)
             {
-                ball.speed = 300;
+
+                paddleL.Position = new Vector2f(10, Settings.HEIGHT / 2 - paddleL.Size.Y / 2);
+                paddleR.Position = new Vector2f(Settings.WIDTH - paddleR.Size.X - 10, Settings.HEIGHT / 2 - paddleR.Size.Y / 2);
                 running = false;
+
             }
+
             // TODO: Loosing game
+  
+            
+            // Increase the level after 15 seconds 
+            //if (getTime() % 15 == 0 && running)
+               // LevelUp();
 
         }
         //----------------------------------------------------------------------------------------------

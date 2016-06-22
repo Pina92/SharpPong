@@ -23,18 +23,18 @@ namespace SharpPong
             
             // Menu background
             this.background = new RectangleShape(new Vector2f(Settings.WIDTH, Settings.HEIGHT));            
-            this.background.Texture = ResourceManager.getTexture("resources/textures/background.png");
+            this.background.Texture = ResourceManager.GetTexture("resources/textures/background.png");
             this.background.Texture.Repeated = true;
             this.background.TextureRect = new IntRect(0, 0, (int)Settings.WIDTH, (int)Settings.HEIGHT);
 
-            display();
+            StartMenu();
 
         }
         //----------------------------------------
-        private void display()
+        private void StartMenu()
         {
             // Display menu
-            string option = menu();
+            string option = DisplayMenu();
 
             // Creating new game
             if (option == "Pong")
@@ -59,29 +59,37 @@ namespace SharpPong
             }
             else if (option == "Exit")
                 window.Close();
+
         }
         //----------------------------------------
-        private string menu()
+        // Display menu and return the name of chosen position
+        private string DisplayMenu()
         {
 
             // Creating menu 
-            Text[] menu = new Text[5];
             String[] list = { "Pong", "Hot-Seat", "Multiplayer", "Arkanoid", "Exit" };
-            Color blue = new Color(255, 255, 255, 170);
+            Text[] menu = new Text[list.Length];
 
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < list.Length; j++)
             {
-                Text position = new Text("0.0", ResourceManager.GetFont("resources/robotastic.ttf"));
+
+                Text position = new Text("", ResourceManager.GetFont("resources/appleberry.ttf"));
                 position.DisplayedString = list[j];
-                position.Position = new Vector2f(Settings.WIDTH / 2 - 25, 50 + j * 120);
-                position.CharacterSize = 25;
-                position.Color = blue;
+                position.Position = new Vector2f(100, 200 + j * 60);
+                position.CharacterSize = 30;
+                position.Color = Color.White;
 
                 menu[j] = position;
 
             }
 
+            // Creating game title
+            Text title = new Text("#Pong", ResourceManager.GetFont("resources/orangejuice.ttf"));
+            title.Position = new Vector2f(Settings.WIDTH/2 - 130, 20);
+            title.CharacterSize = 100;
+            title.Color = Color.Black;
 
+            // Display menu
             bool play = false;
             bool pressedNow = false;
             int i = 0;
@@ -92,7 +100,7 @@ namespace SharpPong
                 // Process events
                 window.DispatchEvents();
 
-                menu[i].Color = Color.Blue;
+                menu[i].Color = Color.Black;
 
                 if (Keyboard.IsKeyPressed(Keyboard.Key.Up) && i > 0 && !pressedNow)
                 {
@@ -106,18 +114,22 @@ namespace SharpPong
                     menu[i].Color = Color.White;
                     i++;
                     pressedNow = true;
+
                 }
                 if (!Keyboard.IsKeyPressed(Keyboard.Key.Down) && !Keyboard.IsKeyPressed(Keyboard.Key.Up))
                 {
                     pressedNow = false;
+
                 }
                 if (Keyboard.IsKeyPressed(Keyboard.Key.Return))
                 {
                     break;
+
                 }
 
                 // Display everything on screen
                 window.Draw(background);
+                window.Draw(title);
 
                 for (int k = 0; k < menu.Length; k++)
                     window.Draw(menu[k]);
@@ -128,6 +140,7 @@ namespace SharpPong
 
             // Return the name of chosen position in menu
             return menu[i].DisplayedString;
+
         }
         //----------------------------------------
     }

@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
-
-using SFML.System;
 using SFML.Graphics;
 
 namespace SharpPong
@@ -32,7 +30,7 @@ namespace SharpPong
 
         }
         //-------------------------------------------------
-        static public Texture getTexture(string texture_path)
+        static public Texture GetTexture(string texture_path)
         {
 
             if (textures.ContainsKey(texture_path))

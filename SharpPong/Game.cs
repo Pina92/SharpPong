@@ -15,7 +15,6 @@ namespace SharpPong
         public RenderWindow window;
         public bool gameOn;
         public bool running;
-        private int level;
 
         // Time
         private Clock clock;
@@ -40,8 +39,7 @@ namespace SharpPong
             // Game
             this.window = rw;
             this.gameOn = true;
-            this.running = false;
-            this.level = 1;
+            this.running = false;            
 
             // Time
             this.clock = new Clock();
@@ -77,21 +75,12 @@ namespace SharpPong
 
             // Background
             this.background = new RectangleShape(new Vector2f(Settings.WIDTH, Settings.HEIGHT));
-            background.Texture = ResourceManager.getTexture("resources/textures/background.png");
+            background.Texture = ResourceManager.GetTexture("resources/textures/background.png");
             background.Texture.Repeated = true;
             background.TextureRect = new IntRect(0, 0, (int)Settings.WIDTH, (int)Settings.HEIGHT);
 
         }
-        //----------------------------------
-        // Increase game level
-        public void LevelUp()
-        {
-
-            level++;
-            ball.speed += 5;
-
-        }
-        //----------------------------------     
+   
         // Handling paddles and ball movement
         public virtual void move() { }
 
@@ -108,15 +97,14 @@ namespace SharpPong
                 
                 deltaTime = clock.Restart().AsSeconds();
 
-               // Back to the menu if Escape was pressed 
-               // TO-DO: Esc -> Resume, Menu, Exit
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
-                {
-                    Menu menu = new Menu(window);
-                }
-
                 // Process events
                 window.DispatchEvents();
+
+                // Back to the menu if Escape was pressed 
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                {
+                    EscMenu();
+                }
 
                 //**********************************************************              
                 if (gameOn)
@@ -155,13 +143,7 @@ namespace SharpPong
                     }
                     seconds = DateTime.Now.Second;
                 }
-                //**********************************************************  
-                // Increase the level after 15 seconds 
 
-                if (getTime() % 15 == 0 && running)
-                    LevelUp();
-
-                //**********************************************************
                 // Display everything on screen
                 renderGame();
             }
@@ -207,6 +189,12 @@ namespace SharpPong
             // Update the window
             window.Display();
 
+        }
+        //----------------------------------
+        protected virtual void EscMenu()
+        {
+            // TO-DO: Mini menu -> Resume, Menu, Exit
+            Menu menu = new Menu(window);
         }
         //----------------------------------
     }
