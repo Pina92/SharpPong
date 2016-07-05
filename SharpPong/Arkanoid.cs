@@ -24,7 +24,9 @@ namespace SharpPong
             this.paddle = new RectangleShape(new Vector2f(120, 20));
             Texture paddleTexture = ResourceManager.GetTexture("resources/textures/paddle2.png");
             paddle.Texture = paddleTexture;
-            paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X, Settings.HEIGHT - paddle.Size.Y - 10);
+            paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X / 2, Settings.HEIGHT - paddle.Size.Y - 10);
+
+            ball.ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2 + 25);
 
         }
         //----------------------------------------------------------------------------------------------

@@ -75,37 +75,42 @@ namespace SharpPong
                 // Waiting for the opponent to connect 
                 waiting = new Thread(startGame);
                 waiting.Start();
+
             }
             catch
             {
-                Console.WriteLine("Server is not responding...");
+                Console.WriteLine("Server is not responding...1");
                 // TO-DO: Back to the menu
                 gameOn = false;
             }
 
         }
         //------------------------------------------------------------------------
-        public void startGame()
+        public void startGame()                                        
         {
             try
             {
-                serverMessage = receive.ReadLine();
-
-                // The game can start
-                if (serverMessage == "Start")
+                while (!gameOn)
                 {
 
-                    gameOn = true;
+                    serverMessage = receive.ReadLine();
 
-                    // Sending coordinates of player's paddle to server
-                    sending = new Thread(new ThreadStart(sendMessage));
-                    sending.Start();
+                    // The game can start
+                    if (serverMessage == "Start")
+                    {
 
+                        gameOn = true;
+
+                        // Sending coordinates of player's paddle to server
+                        sending = new Thread(new ThreadStart(sendMessage));
+                        sending.Start();
+
+                    }
                 }
             }
             catch
             {
-                Console.WriteLine("Server is not responding...");
+                Console.WriteLine("Server is not responding...2");
                 // TO-DO: Back to the menu
                 gameOn = false;
             }
@@ -113,7 +118,8 @@ namespace SharpPong
         }
         //------------------------------------------------------------------------
         public override void move()
-        {         
+        {
+            int score;
 
             // Moving player's paddle
             movePlayer();
@@ -122,7 +128,24 @@ namespace SharpPong
             moveOpponent();
 
             // Moving the ball
-            ball.MovingMultiplayer(deltaTime, ballX, ballY);
+            score = ball.MovingMultiplayer(deltaTime, ballX, ballY);
+
+            // Gaining point by player or by opponent
+            if (score == -1)
+                playerL.score += 1;
+            else if (score == 1)
+                playerR.score += 1;
+
+            if (score != 0)
+            {
+
+                ball.ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
+                paddleL.Position = new Vector2f(10, Settings.HEIGHT / 2 - paddleL.Size.Y / 2);
+                paddleR.Position = new Vector2f(Settings.WIDTH - paddleR.Size.X - 10, Settings.HEIGHT / 2 - paddleR.Size.Y / 2);
+
+                running = false;
+
+            }
 
         }
         //------------------------------------------------------------------------
@@ -133,17 +156,25 @@ namespace SharpPong
             {
                 serverMessage = receive.ReadLine();
 
-                if (serverMessage == "Stop")
+                if (serverMessage == "Waiting")
                 {
 
                     Console.WriteLine("Your opponent left the game. You are the winner :)");
-                    gameOn = false;
-                    running = false;
                     playerL.score = 0;
                     playerR.score = 0;
-                    timer.Restart();
 
-                    startGame();
+                    ballX = Settings.WIDTH / 2;
+                    ballY = Settings.HEIGHT / 2;
+
+                    paddleL.Position = new Vector2f(10, Settings.HEIGHT / 2 - paddleL.Size.Y / 2);
+                    paddleR.Position = new Vector2f(Settings.WIDTH - paddleR.Size.X - 10, Settings.HEIGHT / 2 - paddleR.Size.Y / 2);           
+
+                    gameOn = false;
+                    running = false;
+
+                    // Waiting for the opponent to connect 
+                    waiting = new Thread(startGame);
+                    waiting.Start();
 
                 }
                 else
@@ -158,10 +189,11 @@ namespace SharpPong
                     ballY = Convert.ToSingle(coordinations[2]);
 
                 }
+
             }
             catch
             {
-                Console.WriteLine("Server is not responding...");
+                Console.WriteLine("Server is not responding...3");
                 // TO-DO: Back to the menu
                 gameOn = false;
             }

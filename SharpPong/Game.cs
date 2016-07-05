@@ -7,6 +7,7 @@ using SFML.System;
 using SFML.Graphics;
 using SFML.Window;
 
+
 namespace SharpPong
 {
     class Game
@@ -30,7 +31,7 @@ namespace SharpPong
         public Ball ball;       
 
         // Objects to display
-        Text counting, time, score;
+        protected Text counting, time, score;
         RectangleShape background;
 
         //----------------------------------
@@ -109,14 +110,18 @@ namespace SharpPong
                 //**********************************************************              
                 if (gameOn)
                 {
+
                     if (running)
-                    { // Move player paddle and ball
+                    { 
+                        // Move player paddle and ball.
                         move();
                         pause = false;
                         seconds = DateTime.Now.Second;
+
                     }
                     else
-                    { // Time delaying when player loose
+                    { 
+                        // Time delaying when player loose.
                         if (!pause)
                         {
                             timeAdd = timer.ElapsedTime + timeAdd;
@@ -132,16 +137,16 @@ namespace SharpPong
                             running = true;
                             timer.Restart();
                         }
+
                     }
                 }
                 else
                 {
-                    if (!pause)
-                    {
-                        timeAdd = timer.ElapsedTime + timeAdd;
-                        pause = true;
-                    }
+
+                    timer.Restart();
+                    timeAdd = Time.Zero;
                     seconds = DateTime.Now.Second;
+
                 }
 
                 // Display everything on screen
@@ -163,30 +168,20 @@ namespace SharpPong
         //----------------------------------
         private void renderGame()
         {
-            // Background
+            // Background.
             window.Draw(background);
 
-            // Time    
-            if (running)
-                time.DisplayedString = getTime().ToString();
-
-            window.Draw(time);
-
-            // Ball
+            // Ball.
             window.Draw(ball.ballShape);
-
-            // Player's score
-            score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
-            window.Draw(score);
 
             // Paddles, objects for specific game, etc. 
             postRender();
 
-            // Counting 
-            if (!running)
+            // Counting. 
+            if (!running && gameOn) 
                 window.Draw(counting);
 
-            // Update the window
+            // Update the window.
             window.Display();
 
         }

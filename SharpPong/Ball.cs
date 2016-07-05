@@ -15,7 +15,7 @@ namespace SharpPong
         public float ballSize;
         public float speed;
         private int horizontal = 1, vertical = 1;
-        private double angle;
+        private float angle;
         private const float MAX_ANGLE = 75;
         //------------------------------------------------------------------------------------------------------------------
         public Ball(float ballSize, float speed)
@@ -23,7 +23,7 @@ namespace SharpPong
             this.ballSize = ballSize;
             this.speed = speed;
             this.ballShape = new CircleShape(ballSize);
-            this.angle = Math.PI * 45 / 180;
+            this.angle = (float)Math.PI * 45 / 180;
 
             Texture ballTexture = ResourceManager.GetTexture("resources/textures/ball.png");
             ballTexture.Smooth = true;
@@ -36,11 +36,13 @@ namespace SharpPong
         public int movingPong(float deltaTime, RectangleShape paddleL, RectangleShape paddleR)
         {
 
-            double sin = Math.Sin(angle);
-            double cos = Math.Cos(angle);
-            
+            float sin = (float) Math.Sin(angle);
+            float cos = (float) Math.Cos(angle);
+
             // Updating ball position. 
-            ballShape.Position += new Vector2f(speed * deltaTime * horizontal * (float)cos, speed * deltaTime * vertical * (float)sin);
+            float xDirection = speed * deltaTime * horizontal * cos;
+            float yDirection = speed * deltaTime * vertical * sin;
+            ballShape.Position += new Vector2f(xDirection, yDirection);
 
             // Checking collison between the ball and walls.  
             // Top wall.
@@ -62,18 +64,25 @@ namespace SharpPong
                 ballShape.Position.Y + ballSize >= paddleL.Position.Y &&
                 ballShape.Position.Y <= paddleL.Position.Y + paddleL.Size.Y)
             {
-                // Changing ball angle according to the possition where it hits.              
+                // Calculation ball angle according to the possition where it hits.              
                 float PADDLE_HALF_WIDTH = paddleL.Size.Y / 2;
-                angle = (((paddleL.Position.Y + PADDLE_HALF_WIDTH) - (ballShape.Position.Y + ballSize)) / PADDLE_HALF_WIDTH) * (MAX_ANGLE * (float)Math.PI) / 180;
+                angle = ((paddleL.Position.Y + PADDLE_HALF_WIDTH) - (ballShape.Position.Y + ballSize / 2)) / PADDLE_HALF_WIDTH * MAX_ANGLE;
 
-                vertical *= -1;
+                if (angle > MAX_ANGLE)
+                    angle = MAX_ANGLE;
+
+                // Converting angle to radians.
+                angle = angle * (float)Math.PI / 180;
+
+                vertical = -1;
                 horizontal *= -1;
-                Console.WriteLine("Ping1 " + angle * 180 / (float)Math.PI + "   " + vertical);
+
                 ballShape.Position = new Vector2f(paddleL.Position.X + paddleL.Size.X, ballShape.Position.Y);
+
             }
             
             // Game over for left player.
-            if (ballShape.Position.X + ballSize <= 0f)
+            if (ballShape.Position.X <= 0f)
             {
                 // Setting paddle on the middle of its side. 
                 ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
@@ -83,7 +92,7 @@ namespace SharpPong
                 vertical *= -1;
                 angle = 45 * (float)Math.PI / 180;
 
-                speed = 200;
+                speed = 300;
 
                 return 1;
             }
@@ -94,14 +103,21 @@ namespace SharpPong
                 ballShape.Position.Y >= paddleR.Position.Y - ballSize &&
                 ballShape.Position.Y <= paddleR.Position.Y + paddleR.Size.Y)
             {
-                // Changing ball angle according to the possition where it hits.              
+                // Calculation ball angle according to the possition where it hits.              
                 float PADDLE_HALF_WIDTH = paddleR.Size.Y / 2;
-                angle = ((paddleR.Position.Y + PADDLE_HALF_WIDTH) - (ballShape.Position.Y + ballSize)) / PADDLE_HALF_WIDTH * MAX_ANGLE * (float)Math.PI / 180;
+                angle = ((paddleR.Position.Y + PADDLE_HALF_WIDTH) - (ballShape.Position.Y + ballSize / 2)) / PADDLE_HALF_WIDTH * MAX_ANGLE;
 
-                vertical *= -1;
+                if (angle > MAX_ANGLE)
+                    angle = MAX_ANGLE;
+
+                // Converting angle to radians.
+                angle = angle * (float)Math.PI / 180;
+
+                vertical = -1;
                 horizontal *= -1;
 
                 ballShape.Position = new Vector2f(paddleR.Position.X - ballSize - 10, ballShape.Position.Y);
+
             }
 
             // Game over for right player.
@@ -115,7 +131,7 @@ namespace SharpPong
                 vertical *= -1;
                 angle = 45 * (float)Math.PI / 180;
 
-                speed = 200;
+                speed = 300;
 
                 return -1;
             }
@@ -124,9 +140,21 @@ namespace SharpPong
 
         }
         //------------------------------------------------------------------------------------------------------------------
-        public void MovingMultiplayer(float deltaTime, float ballX, float ballY)
+        public int MovingMultiplayer(float deltaTime, float ballX, float ballY)
         {
+
             ballShape.Position = new Vector2f(ballX, ballY);
+
+            // Game over for left player.
+            if (ballShape.Position.X <= 0f)
+                return 1;
+            
+            // Game over for right player.
+            if (ballShape.Position.X + ballSize >= Settings.WIDTH)
+                return -1;
+
+            return 0;
+
         }
         //------------------------------------------------------------------------------------------------------------------
         // Moving a ball and returning true if player don't hit the ball and loose. 
@@ -140,17 +168,20 @@ namespace SharpPong
 
 
             // Checking collison between the ball and walls.  
-            if (ballShape.Position.X <= 0f) // Left wall
+            // Left wall.
+            if (ballShape.Position.X <= 0f) 
             {
                 horizontal *= -1;
                 ballShape.Position = new Vector2f(0f, ballShape.Position.Y);
             }
-            if (ballShape.Position.X >= Settings.WIDTH - ballShape.Radius) // Right wall
+            // Right wall.
+            if (ballShape.Position.X >= Settings.WIDTH - ballShape.Radius)
             {
                 horizontal *= -1;
                 ballShape.Position = new Vector2f(Settings.WIDTH - ballShape.Radius, ballShape.Position.Y);
             }
-            if (ballShape.Position.Y <= 0f) // Top wall 
+            // Top wall.
+            if (ballShape.Position.Y <= 0f)
             { 
                 vertical *= -1;
                 ballShape.Position = new Vector2f(ballShape.Position.X, 0f);
@@ -159,17 +190,23 @@ namespace SharpPong
             // Checking collison between the ball and paddle. 
             if (ballShape.Position.X <= paddle.Position.X + paddle.Size.X &&
                 ballShape.Position.X + ballShape.Radius >= paddle.Position.X &&
-                ballShape.Position.Y + ballShape.Radius >= paddle.Position.Y &&
+                ballShape.Position.Y + ballShape.Radius + 10 >= paddle.Position.Y &&
                 ballShape.Position.Y + ballShape.Radius <= paddle.Position.Y + paddle.Size.Y)
             {
-                // Changing ball angle according to the possition where it hits.              
+                // Calculation ball angle according to the possition where it hits.              
                 float PADDLE_HALF_WIDTH = paddle.Size.X / 2;
-                angle = ((paddle.Position.X + PADDLE_HALF_WIDTH) - (ballShape.Position.X + ballShape.Radius)) / PADDLE_HALF_WIDTH * MAX_ANGLE * (float)Math.PI / 180;
-                
+                angle = ((paddle.Position.X + PADDLE_HALF_WIDTH) - (ballShape.Position.X + ballSize / 2)) / PADDLE_HALF_WIDTH * MAX_ANGLE;
+
+                if (angle > MAX_ANGLE)
+                    angle = MAX_ANGLE;
+
+                // Converting angle to radians.
+                angle = angle * (float)Math.PI / 180;
+
                 horizontal = -1;
                 vertical *= -1;
 
-                ballShape.Position = new Vector2f(ballShape.Position.X, paddle.Position.Y - ballShape.Radius);
+                ballShape.Position = new Vector2f(ballShape.Position.X, paddle.Position.Y - ballShape.Radius - 10);
                
             }
            
@@ -177,7 +214,7 @@ namespace SharpPong
             // Game over. 
             if (ballShape.Position.Y >= Settings.HEIGHT)
             {
-                ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
+                ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2 + 25);
                 paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X / 2, paddle.Position.Y);
                 angle = 45 * (float)Math.PI / 180;
                 speed = 300;

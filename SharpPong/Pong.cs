@@ -123,6 +123,16 @@ namespace SharpPong
             window.Draw(paddleL);
             window.Draw(paddleR);
 
+            // Time    
+            if (running || !gameOn)
+                time.DisplayedString = getTime().ToString();
+
+            window.Draw(time);
+
+            // Player's score
+            score.DisplayedString = playerL.score.ToString() + " : " + playerR.score.ToString();
+            window.Draw(score);
+
         }
         //----------------------------------------------------------------------------------------------
     }

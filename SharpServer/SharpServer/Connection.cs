@@ -14,109 +14,103 @@ namespace SharpServer
     class Connection
     {
 
-        private TcpClient player1, player2;
+        private TcpClient playerLeft, playerRight;
         private TcpListener connections; 
 
-        private StreamReader receivePlayer1, receivePlayer2;
-        private StreamWriter sendPlayer1, sendPlayer2;
+        private StreamReader receivePlayerLeft, receivePlayerRight;
+        private StreamWriter sendPlayerLeft, sendPlayerRight;
 
-        private Thread messagesPlayer1, messagesPlayer2, sendMessages;
+        private Thread messagesPlayerLeft, messagesPlayerRight, sendMessages, waitingForPlayer;
 
-        private string namePlayer1, namePlayer2;
+        private string namePlayerLeft, namePlayerRight;
         private string paddleLeftX, paddleLeftY, paddleRightX, paddleRightY;
 
-        private bool connected;
+        // True if both of players are connected.
+        private bool connected, playerLeftConnected, playerRightConnected, counting;
 
         private Ball ball = new Ball(14, 8);
+
+        public int seconds2;
         //-------------------------------------------------------------------
         public Connection()
         {
 
             this.connected = false;
-            StartListening();
+            this.counting = true;
 
-        }
-        //-------------------------------------------------------------------
-        private void StartListening()
-        {
             // Listen for connections from TCP network clients.
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             connections = new TcpListener(ipAddress, 8001);
             connections.Start();
 
-            Console.WriteLine("Waiting for a connection...");
-            WaitingForPlayers();
+            sendMessages = new Thread(SendMessages);
+            sendMessages.Start();
+
+            waitingForPlayer = new Thread (WaitingForPlayer);
+            waitingForPlayer.Start();
 
         }
         //-------------------------------------------------------------------
-        // Get messages from player1.
-        private void GetMessages1()
+        // Get messages from left player.
+        private void GetMessagesLeft()
         {
-            string[] dataPlayer1;
+
+            string[] dataPlayerLeft;
 
             try
             {
                 while (connected)
                 {
 
-                    dataPlayer1 = receivePlayer1.ReadLine().Split('|');
-                    paddleLeftX = dataPlayer1[0];
-                    paddleLeftY = dataPlayer1[1];
+                    dataPlayerLeft = receivePlayerLeft.ReadLine().Split('|');
+                    paddleLeftX = dataPlayerLeft[0];
+                    paddleLeftY = dataPlayerLeft[1];
 
                 }
             }
             catch
             {
                 // Close the connection and stream.
-                receivePlayer1.Close();
-                sendPlayer1.Close();
-                player1.Close();
-                Console.WriteLine("Player1 has disconnected.");
+                receivePlayerLeft.Close();
+                sendPlayerLeft.Close();
+                playerLeft.Close();
 
-                if (player2.Connected == true)
-                {
-                    sendPlayer2.WriteLine("Stop");
-                    sendPlayer2.Flush();
+                playerLeftConnected = false;
+                Console.WriteLine("Player left has disconnected.");
 
-                    connected = false;
-                    WaitingForPlayers();
-                }
+                connected = false;
+
             }
 
         }
         //-------------------------------------------------------------------
-        // Get messages from player2.
-        private void GetMessages2()
+        // Get messages from right player.
+        private void GetMessagesRight()
         {
-            string[] dataPlayer2;
+            string[] dataPlayerRight;
 
             try
             {
                 while (connected)
                 {
 
-                    dataPlayer2 = receivePlayer2.ReadLine().Split('|');
-                    paddleRightX = dataPlayer2[0];
-                    paddleRightY = dataPlayer2[1];
+                    dataPlayerRight = receivePlayerRight.ReadLine().Split('|');
+                    paddleRightX = dataPlayerRight[0];
+                    paddleRightY = dataPlayerRight[1];
 
                 }
             }
             catch
             {
                 // Close the connection and stream.
-                receivePlayer2.Close();
-                sendPlayer2.Close();
-                player2.Close();
-                Console.WriteLine("Player2 has disconnected.");
+                receivePlayerRight.Close();
+                sendPlayerRight.Close();
+                playerRight.Close();
 
-                if (player1.Connected == true)
-                {
-                    sendPlayer1.WriteLine("Stop");
-                    sendPlayer1.Flush();
+                playerRightConnected = false;
+                Console.WriteLine("Player right has disconnected.");
 
-                    connected = false;
-                    WaitingForPlayers();
-                }
+                connected = false;
 
             }
 
@@ -126,98 +120,195 @@ namespace SharpServer
         private void SendMessages()
         {
 
-            int seconds2 = DateTime.Now.Millisecond;
+            int seconds = DateTime.Now.Millisecond;
 
-            try
+            while(true)
             {
-                while (connected)
-                {                  
+
+                try
+                {
+
                     // Send message after 30 milliseconds.
-                    int delay = Math.Abs(DateTime.Now.Millisecond - seconds2);
+                    int delay = Math.Abs(DateTime.Now.Millisecond - seconds);
                     if (delay > 30)
                     {
 
-                        MovingBall();
-                        string ballCoordinates = Convert.ToString(ball.GetBallX()) + '|' + Convert.ToString(ball.GetBallY());
-
-                        if (player1.Connected == true && paddleRightY != null)
+                        if (playerLeftConnected == true && playerRightConnected == false)
                         {
-                            sendPlayer1.WriteLine(paddleRightY + '|' + ballCoordinates);
-                            sendPlayer1.Flush();
+                            sendPlayerLeft.WriteLine("Waiting");
+                            sendPlayerLeft.Flush();
                         }
 
-                        if (player2.Connected == true && paddleLeftY != null)
+                        if (playerRightConnected == true && playerLeftConnected == false)
                         {
-                            sendPlayer2.WriteLine(paddleLeftY + '|' + ballCoordinates);
-                            sendPlayer2.Flush();
+                            sendPlayerRight.WriteLine("Waiting");
+                            sendPlayerRight.Flush();
                         }
 
-                        seconds2 = DateTime.Now.Millisecond;
+                        if(playerLeftConnected == true && playerRightConnected == true && !connected)
+                        {
+
+                            sendPlayerLeft.WriteLine("Start");
+                            sendPlayerLeft.Flush();
+
+                            sendPlayerRight.WriteLine("Start");
+                            sendPlayerRight.Flush();                      
+
+                            connected = true;
+                            counting = true;
+
+                            ball.SetBallX(Settings.WIDTH / 2);
+                            ball.SetBallY(Settings.HEIGHT / 2);
+
+                            messagesPlayerLeft = new Thread(GetMessagesLeft);
+                            messagesPlayerLeft.Start();
+
+                            messagesPlayerRight = new Thread(GetMessagesRight);
+                            messagesPlayerRight.Start();
+
+                            seconds2 = DateTime.Now.Second;
+
+                        }
+
+                        if (connected)
+                        {
+                            // Wait three seconds before the game begins. 
+                            if (counting)
+                            {
+
+                                int countingNumber = 3 - Math.Abs(DateTime.Now.Second - seconds2);
+                                if (countingNumber == 0 || countingNumber < 0)
+                                    counting = false;
+
+                            }
+                            else if (!counting)
+                            {
+                                // Moving ball.
+                                int gameOver = ball.MovingBall(Convert.ToSingle(paddleLeftX), Convert.ToSingle(paddleLeftY), Convert.ToSingle(paddleRightX), Convert.ToSingle(paddleRightY));
+
+                                string ballCoordinates = Convert.ToString(ball.GetBallX()) + '|' + Convert.ToString(ball.GetBallY());
+
+                                
+                                // Sending players paddle and ball coordinates.
+                                if (playerLeft.Connected == true && paddleRightY != null)
+                                {
+                                    sendPlayerLeft.WriteLine(paddleRightY + '|' + ballCoordinates);
+                                    sendPlayerLeft.Flush();
+                                }
+                                if (playerRight.Connected == true && paddleLeftY != null)
+                                {
+                                    sendPlayerRight.WriteLine(paddleLeftY + '|' + ballCoordinates);
+                                    sendPlayerRight.Flush();
+                                }
+                          
+                                
+                                // Checking if one of players wins.
+                                if (gameOver != 0)
+                                {
+
+                                    paddleRightY = Convert.ToString(Settings.HEIGHT / 2 - Settings.paddleSizeY / 2);
+                                    paddleLeftY = Convert.ToString(Settings.HEIGHT / 2 - Settings.paddleSizeY / 2);
+
+                                    ball.SetBallX(Settings.WIDTH / 2);
+                                    ball.SetBallY(Settings.HEIGHT / 2);
+
+                                    counting = true;
+
+                                }
+
+
+                                seconds2 = DateTime.Now.Second;
+                            }
+
+                        }
+
+                        seconds = DateTime.Now.Millisecond;
+
                     }
+
                 }
+                // Occurs when one of the players disconnects during waiting for another player.
+                catch
+                {
+
+                    if (playerLeftConnected == true)
+                    {
+                        // Close the connection and stream.
+                        receivePlayerLeft.Close();
+                        sendPlayerLeft.Close();
+                        playerLeft.Close();
+
+                        playerLeftConnected = false;
+                        Console.WriteLine("Player left has disconnected 2.");
+
+                    }                       
+
+                    if (playerRightConnected == true)
+                    {
+                        // Close the connection and stream.
+                        receivePlayerRight.Close();
+                        sendPlayerRight.Close();
+                        playerRight.Close();
+
+                        playerRightConnected = false;
+                        Console.WriteLine("Player right has disconnected 2.");
+
+                    }
+
+                    counting = true;
+
+                }
+
             }
-            catch
-            {
-                Console.WriteLine("Sending stop");
-            }
+
         }
         //-------------------------------------------------------------------
-        private void WaitingForPlayers()
+        // Waiting for player to connect.
+        private void WaitingForPlayer()
         {
-            while (!connected)
+
+            while (true)
             {
-                if (player1 == null || player1.Connected == false)
-               {
-                    // Player1 joined the game.
-                    player1 = connections.AcceptTcpClient();
 
-                    receivePlayer1 = new StreamReader(player1.GetStream());
-                    sendPlayer1 = new StreamWriter(player1.GetStream());
+                Console.WriteLine("Waiting for player...");
+                TcpClient player = connections.AcceptTcpClient();
 
-                    namePlayer1 = receivePlayer1.ReadLine();
-                    Console.WriteLine(namePlayer1 + " joined the game.");
-
-                    sendPlayer1.WriteLine("Left");
-                    sendPlayer1.Flush();
-
-               }
-                else if (player2 == null || player2.Connected == false)
+                // Player left connected.
+                if (!playerLeftConnected)
                 {
-                    // Player2 joined the game.
-                    player2 = connections.AcceptTcpClient();
 
-                    receivePlayer2 = new StreamReader(player2.GetStream());
-                    sendPlayer2 = new StreamWriter(player2.GetStream());
+                    playerLeft = player;
 
-                    namePlayer2 = receivePlayer2.ReadLine();
-                    Console.WriteLine(namePlayer2 + " joined the game.");
+                    // Player left joined the game.
+                    receivePlayerLeft = new StreamReader(playerLeft.GetStream());
+                    sendPlayerLeft = new StreamWriter(playerLeft.GetStream());
 
-                    sendPlayer2.WriteLine("Right");
-                    sendPlayer2.Flush();
+                    namePlayerLeft = receivePlayerLeft.ReadLine();
+                    Console.WriteLine("Player left joined the game.");
 
-               }
-               else if (player1.Connected == true && player2.Connected == true)
-               {
-                    // Both players are connected and the game can start.
-                    sendPlayer1.WriteLine("Start");
-                    sendPlayer1.Flush();
+                    sendPlayerLeft.WriteLine("Left");
+                    sendPlayerLeft.Flush();
 
-                    sendPlayer2.WriteLine("Start");
-                    sendPlayer2.Flush();
+                    playerLeftConnected = true;
+                }
+                // Player right connected.
+                else if (!playerRightConnected)
+                {
 
-                    Console.WriteLine("Listening...");
-                    connected = true;
+                    playerRight = player;
 
-                    messagesPlayer1 = new Thread(GetMessages1);
-                    messagesPlayer1.Start();
+                    // Player right joined the game.
+                    receivePlayerRight = new StreamReader(playerRight.GetStream());
+                    sendPlayerRight = new StreamWriter(playerRight.GetStream());
 
-                    messagesPlayer2 = new Thread(GetMessages2);
-                    messagesPlayer2.Start();
+                    namePlayerRight = receivePlayerRight.ReadLine();
+                    Console.WriteLine("Player right joined the game.");
 
-                    sendMessages = new Thread(SendMessages);
-                    sendMessages.Start();
+                    sendPlayerRight.WriteLine("Right");
+                    sendPlayerRight.Flush();
 
-               }
+                    playerRightConnected = true;
+                }
 
             }
 
@@ -233,6 +324,8 @@ namespace SharpServer
                    
                 paddleRightY = Convert.ToString(Settings.HEIGHT / 2 - Settings.paddleSizeY / 2);
                 paddleLeftY = Convert.ToString(Settings.HEIGHT / 2 - Settings.paddleSizeY / 2);
+
+                counting = true;
 
             }
 
