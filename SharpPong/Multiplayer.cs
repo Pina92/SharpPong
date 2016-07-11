@@ -19,11 +19,13 @@ namespace SharpPong
 
         public Multiplayer(RenderWindow rw) : base(rw)
         {
-           gameOn = false;
-           startConnection();
+
+            gameOn = false;
+            StartConnection();
+
         }
 
-        // Player informations
+        // Player informations.
         private string userName = "Unknown";
 
         private TcpClient player;
@@ -31,15 +33,16 @@ namespace SharpPong
         private StreamReader receive;
 
         private Thread sending, waiting;
-        string serverMessage;
+        private string serverMessage;
 
         private float ballX, ballY;
         //------------------------------------------------------------------------
-        public void startConnection()
+        public void StartConnection()
         {
+
             try
             {
-                // Establishing the connection to the server
+                // Establishing the connection with server.
                 player = new TcpClient();
                 player.NoDelay = true;
                 player.Connect("127.0.0.1", 8001);
@@ -47,12 +50,12 @@ namespace SharpPong
                 send = new StreamWriter(player.GetStream());
                 receive = new StreamReader(player.GetStream());
 
-                // Sending username to server
+                // Sending username to server.
                 userName = "Paulina";
                 send.WriteLine(userName);
                 send.Flush();
 
-                // On with side player has a paddle
+                // On which side player has a paddle.
                 serverMessage = receive.ReadLine();
 
                 if (serverMessage == "Left")
@@ -72,22 +75,24 @@ namespace SharpPong
                     // this.player1.setPlayersKeys(keysPlayer);        
                 }
 
-                // Waiting for the opponent to connect 
-                waiting = new Thread(startGame);
+                // Waiting for the opponent to connect. 
+                waiting = new Thread(StartGame);
                 waiting.Start();
 
             }
             catch
             {
+
                 Console.WriteLine("Server is not responding...1");
-                // TO-DO: Back to the menu
                 gameOn = false;
+
             }
 
         }
         //------------------------------------------------------------------------
-        public void startGame()                                        
+        public void StartGame()                                        
         {
+
             try
             {
                 while (!gameOn)
@@ -95,14 +100,14 @@ namespace SharpPong
 
                     serverMessage = receive.ReadLine();
 
-                    // The game can start
+                    // The game can start.
                     if (serverMessage == "Start")
                     {
 
                         gameOn = true;
 
-                        // Sending coordinates of player's paddle to server
-                        sending = new Thread(new ThreadStart(sendMessage));
+                        // Sending coordinates of player's paddle to server.
+                        sending = new Thread(new ThreadStart(SendMessage));
                         sending.Start();
 
                     }
@@ -110,27 +115,31 @@ namespace SharpPong
             }
             catch
             {
+
                 Console.WriteLine("Server is not responding...2");
-                // TO-DO: Back to the menu
                 gameOn = false;
+
             }
 
         }
         //------------------------------------------------------------------------
-        public override void move()
+        protected override void Move()
         {
             int score;
 
-            // Moving player's paddle
-            movePlayer();
+            if (window.HasFocus())
+            {
+                // Moving player's paddle.
+                MovePlayer();
+            }
 
-            // Moving opponent's paddle
-            moveOpponent();
+            // Moving opponent's paddle.
+            MoveOpponent();
 
-            // Moving the ball
+            // Moving the ball.
             score = ball.MovingMultiplayer(deltaTime, ballX, ballY);
 
-            // Gaining point by player or by opponent
+            // Gaining point by player or by opponent.
             if (score == -1)
                 playerL.score += 1;
             else if (score == 1)
@@ -149,9 +158,10 @@ namespace SharpPong
 
         }
         //------------------------------------------------------------------------
-        // Receiving and updating the position of the opponent paddle
-        public override void moveOpponent()
+        // Receiving and updating the position of the opponent paddle.
+        protected override void MoveOpponent()
         {
+
             try
             {
                 serverMessage = receive.ReadLine();
@@ -172,8 +182,8 @@ namespace SharpPong
                     gameOn = false;
                     running = false;
 
-                    // Waiting for the opponent to connect 
-                    waiting = new Thread(startGame);
+                    // Waiting for the opponent to connect. 
+                    waiting = new Thread(StartGame);
                     waiting.Start();
 
                 }
@@ -193,17 +203,21 @@ namespace SharpPong
             }
             catch
             {
+
                 Console.WriteLine("Server is not responding...3");
-                // TO-DO: Back to the menu
                 gameOn = false;
+
             }
+
         }
         //------------------------------------------------------------------------
-        private void sendMessage()
+        private void SendMessage()
         {
+
             int seconds2 = DateTime.Now.Millisecond;
             try
             {
+
                 while (gameOn)
                 {
                     // Send message after 30 milliseconds.
@@ -219,6 +233,7 @@ namespace SharpPong
                     }
 
                 }
+
             }
             catch
             {
@@ -229,12 +244,14 @@ namespace SharpPong
         //------------------------------------------------------------------------
         protected override void EscMenu()
         {
-            Console.WriteLine("Sending stop2");
+
             try
             {
+
                 receive.Close();
                 send.Close();
                 player.Close();
+
             }
             catch { }
 

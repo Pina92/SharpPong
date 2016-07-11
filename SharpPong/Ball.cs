@@ -11,15 +11,17 @@ namespace SharpPong
 {
     class Ball
     {
+
         public CircleShape ballShape;
         public float ballSize;
         public float speed;
         private int horizontal = 1, vertical = 1;
         private float angle;
-        private const float MAX_ANGLE = 75;
+        private const float MAX_ANGLE = 70;
         //------------------------------------------------------------------------------------------------------------------
         public Ball(float ballSize, float speed)
         {
+
             this.ballSize = ballSize;
             this.speed = speed;
             this.ballShape = new CircleShape(ballSize);
@@ -30,6 +32,7 @@ namespace SharpPong
             this.ballShape.Texture = ballTexture;
 
             this.ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2);
+
         }
         //------------------------------------------------------------------------------------------------------------------
         // Moving a ball and returning '1' if player on the right side wins or '-1' if player on the left side wins or '0' if nobody wins. 
@@ -163,9 +166,9 @@ namespace SharpPong
 
             double sin = Math.Sin(angle);
             double cos = Math.Cos(angle);
+
             // Updating ball position. 
             ballShape.Position += new Vector2f(speed * deltaTime * horizontal * (float)sin , speed * deltaTime * vertical * (float)cos);
-
 
             // Checking collison between the ball and walls.  
             // Left wall.
@@ -193,6 +196,7 @@ namespace SharpPong
                 ballShape.Position.Y + ballShape.Radius + 10 >= paddle.Position.Y &&
                 ballShape.Position.Y + ballShape.Radius <= paddle.Position.Y + paddle.Size.Y)
             {
+                
                 // Calculation ball angle according to the possition where it hits.              
                 float PADDLE_HALF_WIDTH = paddle.Size.X / 2;
                 angle = ((paddle.Position.X + PADDLE_HALF_WIDTH) - (ballShape.Position.X + ballSize / 2)) / PADDLE_HALF_WIDTH * MAX_ANGLE;
@@ -214,33 +218,92 @@ namespace SharpPong
             // Game over. 
             if (ballShape.Position.Y >= Settings.HEIGHT)
             {
+
                 ballShape.Position = new Vector2f(Settings.WIDTH / 2, Settings.HEIGHT / 2 + 25);
                 paddle.Position = new Vector2f(Settings.WIDTH / 2 - paddle.Size.X / 2, paddle.Position.Y);
                 angle = 45 * (float)Math.PI / 180;
                 speed = 300;
 
-                return false;                
+                return false;
+
             }
 
             
             // Checking if ball hits one of tiles.
             int x = (int)Math.Floor(ballShape.Position.X / tiles.sizeX);
-            int y = (int)Math.Floor((ballShape.Position.Y - tiles.sizeY) / tiles.sizeY);
+            int y = (int)Math.Floor(ballShape.Position.Y / tiles.sizeY);
 
-            if (x >= 0 && x < tiles.xTab && y >= 0 && y < tiles.yTab && tiles.tileMap[x,y] == 49 )
+            if (x >= 0 && x < tiles.xTab && y >= 0 && y < tiles.yTab)
             {
-                tiles.tileMap[x, y] = '0';
-                vertical *= -1;
 
-            }
-            if (x >= 0 && y < tiles.yTab && y >= 0 && x < tiles.xTab && tiles.tileMap[x, y] == 50)
-            {
-                tiles.tileMap[x, y] = '1';
-                vertical *= -1;
-                tiles.tiles[x, y].Texture = ResourceManager.GetTexture("resources/textures/brick2.png");
+                if (tiles.tileMap[x, y] == '1' || tiles.tileMap[x, y] == '2')
+                {
+                    // Changing ball direction according to the possition where it hits. 
+                    if (Math.Ceiling(ballShape.Position.Y) == tiles.tiles[x, y].Position.Y + tiles.sizeY)
+                    {
+
+                        vertical *= -1;
+
+                    }
+                    if (Math.Ceiling(ballShape.Position.X) == tiles.tiles[x, y].Position.X + tiles.sizeX)
+                    {
+
+                        horizontal *= -1;
+                        
+                    }
+
+                    UpdateTilesMap(x, y, tiles);
+
+                }
+
+                // Checking tiles located next to current one.
+                if (y + 1 >= 0 && y + 1 < tiles.yTab)
+                {
+                    if (tiles.tileMap[x, y + 1] == '1' || tiles.tileMap[x, y + 1] == '2')
+                        if (Math.Ceiling(ballShape.Position.Y) + ballSize == tiles.tiles[x, y + 1].Position.Y)
+                        {
+
+                            vertical *= -1;
+                            UpdateTilesMap(x, y + 1, tiles);
+
+                        }
+                }
+
+                if (x + 1 >= 0 && x + 1 < tiles.yTab)
+                {
+                    if (tiles.tileMap[x + 1, y] == '1' || tiles.tileMap[x + 1, y] == '2')
+                        if (Math.Ceiling(ballShape.Position.X) + ballSize == tiles.tiles[x + 1, y].Position.X)
+                        {
+
+                            horizontal *= -1;
+                            UpdateTilesMap(x+1, y, tiles);
+
+                        }
+                }
+
             }
 
             return true;
+        }
+        //------------------------------------------------------------------------------------------------------------------
+        void UpdateTilesMap(int x, int y, Tiles tiles)
+        {
+            
+            // Updating maps.
+            if (tiles.tileMap[x, y] == '1')
+            {
+
+                tiles.tileMap[x, y] = '0';
+
+            }
+            else if (tiles.tileMap[x, y] == '2')
+            {
+
+                tiles.tileMap[x, y] = '1';
+                tiles.tiles[x, y].Texture = ResourceManager.GetTexture("resources/textures/brick0.png");
+
+            }
+
         }
         //------------------------------------------------------------------------------------------------------------------
     }

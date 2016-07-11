@@ -82,56 +82,57 @@ namespace SharpPong
 
         }
    
-        // Handling paddles and ball movement
-        public virtual void move() { }
+        // Handling paddles and ball movement.
+        protected virtual void Move() { }
 
-        // Displaying paddles, objects for specific game, etc. 
-        public virtual void postRender() { }
+        // Displaying objects for specific game mode. 
+        protected virtual void PostRender() { }
         //----------------------------------
-        // Running game
-        public void run()
+        // Running the game.
+        public void RunGame()
         {
                       
-            // Game loop
+            // Game main loop.
             while (window.IsOpen)
-            {
-                
-                deltaTime = clock.Restart().AsSeconds();
+            {                
 
-                // Process events
+                // Process window events.
                 window.DispatchEvents();
 
-                // Back to the menu if Escape was pressed 
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                // Back to the menu if Escape was pressed. 
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Escape) && window.HasFocus())
                 {
                     EscMenu();
                 }
 
+                deltaTime = clock.Restart().AsSeconds();
                 //**********************************************************              
                 if (gameOn)
                 {
 
                     if (running)
-                    { 
+                    {
                         // Move player paddle and ball.
-                        move();
+                        Move();
                         pause = false;
                         seconds = DateTime.Now.Second;
 
                     }
+                    // Time delaying when player loose.
                     else
-                    { 
-                        // Time delaying when player loose.
+                    {
+                        
+                        // Remember the time when the counting starts.
                         if (!pause)
                         {
                             timeAdd = timer.ElapsedTime + timeAdd;
                             pause = true;
                         }
-
+                        
                         int countingNumber = 3 - Math.Abs(DateTime.Now.Second - seconds);
                         counting.DisplayedString = countingNumber.ToString();
-                        
-                        if(countingNumber == 0 || countingNumber < 0)
+
+                        if (countingNumber == 0 || countingNumber < 0)
                         {
                             counting.DisplayedString = "0";
                             running = true;
@@ -139,6 +140,7 @@ namespace SharpPong
                         }
 
                     }
+
                 }
                 else
                 {
@@ -149,14 +151,14 @@ namespace SharpPong
 
                 }
 
-                // Display everything on screen
-                renderGame();
-            }
+                RenderGame();
+
+            }       
 
         }
         //----------------------------------
-        // Returning game time 
-        public double getTime()
+        // Returning game time. 
+        protected double GetTime()
         {
 
             Time temp = timer.ElapsedTime + timeAdd;
@@ -166,7 +168,8 @@ namespace SharpPong
 
         }
         //----------------------------------
-        private void renderGame()
+        // Display everything on screen.
+        private void RenderGame()
         {
             // Background.
             window.Draw(background);
@@ -174,8 +177,8 @@ namespace SharpPong
             // Ball.
             window.Draw(ball.ballShape);
 
-            // Paddles, objects for specific game, etc. 
-            postRender();
+            // Objects for specific game mode. 
+            PostRender();
 
             // Counting. 
             if (!running && gameOn) 
@@ -188,8 +191,9 @@ namespace SharpPong
         //----------------------------------
         protected virtual void EscMenu()
         {
-            // TO-DO: Mini menu -> Resume, Menu, Exit
+
             Menu menu = new Menu(window);
+
         }
         //----------------------------------
     }

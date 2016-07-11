@@ -11,12 +11,13 @@ namespace SharpPong
 {
     class PongHotSeat : Pong
     {
+
         private string[] keysPlayerR;
 
         public PongHotSeat(RenderWindow rw) : base(rw)
         {
 
-            // Players keys
+            // Players keys.
             this.keysPlayer = new string[2] { "W", "S" };
             this.playerL.setPlayersKeys(keysPlayer);
 
@@ -25,16 +26,21 @@ namespace SharpPong
 
         }
         //-------------------------------------------------
-        public override void moveOpponent()
+        protected override void MoveOpponent()
         {
-            // Moving player's paddle
-            if (Keyboard.IsKeyPressed((Keyboard.Key)playerR.keys[0]) && paddleR.Position.Y > 5f)
+
+            if (window.HasFocus())
             {
-                paddleR.Position += new Vector2f(0f, -paddleSpeed * deltaTime);
-            }
-            if (Keyboard.IsKeyPressed((Keyboard.Key)playerR.keys[1]) && paddleR.Position.Y < Settings.HEIGHT - (paddleR.Size.Y + 5))
-            {
-                paddleR.Position += new Vector2f(0f, paddleSpeed * deltaTime);
+                // Moving player's paddle.
+                if (Keyboard.IsKeyPressed((Keyboard.Key)playerR.keys[0]) && paddleR.Position.Y > 5f)
+                {
+                    paddleR.Position += new Vector2f(0f, -paddleSpeed * deltaTime);
+                }
+                if (Keyboard.IsKeyPressed((Keyboard.Key)playerR.keys[1]) && paddleR.Position.Y < Settings.HEIGHT - (paddleR.Size.Y + 5))
+                {
+                    paddleR.Position += new Vector2f(0f, paddleSpeed * deltaTime);
+                }
+
             }
 
         }

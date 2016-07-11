@@ -11,41 +11,48 @@ namespace SharpPong
 {
     class Tiles
     {
-        public char[,] tileMap;
+        
+        // Tile size.
+        public int sizeX, sizeY;
+        // Quantity of tiles in row and column.
         public int xTab, yTab;
+
+        public char[,] tileMap;
         public RectangleShape[,] tiles;
-        public int sizeX, sizeY; // tile size
 
         public Tiles(int sizeX, int sizeY)
         {
+
             this.sizeX = sizeX;
             this.sizeY = sizeY;
 
-            this.xTab = (int)(Settings.WIDTH - 20) / sizeX;
+            this.xTab = (int)(Settings.WIDTH) / sizeX;
             this.yTab = (int)(Settings.HEIGHT / 2) / sizeY;
 
             this.tileMap = new char[xTab, yTab];
             this.tiles = new RectangleShape[xTab, yTab];
+
         }
 //-----------------------------------------------------------------------------------------------
-        // Read tiles from file 
-        public void readTiles()
+        // Read tiles from file. 
+        public void ReadTiles()
         {
 
-            int posX = 0, posY = 10;
             StreamReader reader = new StreamReader("resources/map.txt");
-           
+            int posX, posY = 0;
+
             for (int y = 0; y < yTab; y++) 
             {
-                posY += sizeY;
-                posX = 10;
+
+                posX = 0;
 
                 for (int x = 0; x < xTab; x++)
                 {
+
                     char ch = (char)reader.Read();
                     tileMap[x, y] = ch;
 
-                    RectangleShape tile = new RectangleShape(new Vector2f(sizeX - 5, sizeY - 5));
+                    RectangleShape tile = new RectangleShape(new Vector2f(sizeX, sizeY));
                     tile.Position = new Vector2f(posX, posY);
 
                     if (ch == '1')
@@ -54,17 +61,22 @@ namespace SharpPong
                     }
                     else if (ch == '2')
                     {
-                        tile.Texture = ResourceManager.GetTexture("resources/textures/brick1.png");
+                        tile.Texture = ResourceManager.GetTexture("resources/textures/brick3.png");
                     }
 
                     tiles[x, y] = tile;
 
                     posX += sizeX;
+
                 }
+
+                posY += sizeY;
+
             }
 
             reader.Close();
             reader.Dispose();
+
         }
 //-----------------------------------------------------------------------------------------------
     }
